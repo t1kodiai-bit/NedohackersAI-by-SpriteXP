@@ -1,0 +1,3524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NedohackersAI</title>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/json.min.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+
+:root {
+    --bg: #090b09;
+    --panel: #101310;
+    --border: #252b25;
+    --green: #45d66b;
+    --text: #e6e9e6;
+    --muted: #858b85;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Анимированный фон */
+#bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.app {
+    position: relative;
+    z-index: 1;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    height: 62px;
+    flex-shrink: 0;
+    padding: 0 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .04));
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+.logo {
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.logo span { color: var(--green); }
+
+.status {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+main {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 28px 20px;
+}
+
+#messages {
+    max-width: 1050px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.welcome {
+    margin: auto;
+    text-align: center;
+    color: var(--muted);
+    padding: 50px 0;
+}
+
+.welcome h1 {
+    color: var(--text);
+    font-size: clamp(25px, 4vw, 38px);
+    margin-bottom: 12px;
+}
+
+.welcome span { color: var(--green); }
+
+.message {
+    width: fit-content;
+    max-width: 100%;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    font-size: 15px;
+}
+
+.message.user {
+    align-self: flex-end;
+    max-width: 85%;
+    padding: 12px 17px;
+    background: linear-gradient(135deg, rgba(69, 214, 107, .16), rgba(69, 214, 107, .06));
+    border: 1px solid rgba(69, 214, 107, .30);
+    border-radius: 16px;
+    white-space: pre-wrap;
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+.message.assistant {
+    align-self: stretch;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 16px;
+    white-space: normal;
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+.codebox {
+    margin: 14px 0;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 12px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02)), rgba(6, 9, 6, .38);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .10);
+    width: 100%;
+}
+
+.codehead {
+    min-height: 43px;
+    padding: 0 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(255, 255, 255, .06);
+    border-bottom: 1px solid rgba(255, 255, 255, .10);
+}
+
+.codetitle {
+    color: var(--green);
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.copy {
+    background: transparent;
+    color: #b9c0b9;
+    border: 1px solid #3b433b;
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.copy:hover {
+    color: var(--green);
+    border-color: var(--green);
+}
+
+.codebox pre {
+    margin: 0;
+    padding: 18px;
+    overflow: auto;
+    max-height: 600px;
+    tab-size: 4;
+}
+
+.codebox pre code.hljs {
+    padding: 0;
+    background: transparent;
+}
+
+.codebox code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    white-space: pre;
+}
+
+footer {
+    flex-shrink: 0;
+    padding: 10px 20px 12px;
+    background: transparent;
+}
+
+.inputwrap {
+    max-width: 1050px;
+    margin: auto;
+}
+
+/* ===== PromptBar (React Bits) ===== */
+.prompt-bar {
+    --pb-bg: #27272a;
+    --pb-ink: #f5f5f5;
+    --pb-menu: #323236;
+    --pb-w: 760px;
+    --pb-radius: 16px;
+    --pb-press: 0.96;
+    --pb-spark: #45d66b;
+    --pb-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --pb-muted: color-mix(in srgb, var(--pb-ink) 55%, transparent);
+    --pb-hover: color-mix(in srgb, var(--pb-ink) 8%, transparent);
+
+    position: relative;
+    width: min(var(--pb-w), 100%);
+    margin: 0 auto;
+    color: var(--pb-ink);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.prompt-bar__menu {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    left: 0;
+    z-index: 5;
+    padding: 4px;
+    border-radius: 12px;
+    background: var(--pb-menu);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.08);
+    transform-origin: bottom center;
+    animation: prompt-bar-pop 180ms var(--pb-ease-out) both;
+}
+
+@keyframes prompt-bar-pop {
+    from { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+
+.prompt-bar__glow {
+    position: absolute;
+    right: 4px;
+    left: 4px;
+    border-radius: 8px;
+    background: var(--pb-hover);
+    opacity: 0;
+    pointer-events: none;
+    transition: top 220ms var(--pb-ease-out), height 220ms var(--pb-ease-out), opacity 150ms ease;
+}
+
+.prompt-bar__row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 36px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.prompt-bar__row-name { flex: none; font-size: 13px; font-weight: 500; }
+
+.prompt-bar__row-desc {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--pb-muted);
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.prompt-bar__empty {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 8px;
+    color: var(--pb-muted);
+    font-size: 12px;
+}
+
+.prompt-bar__field {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: var(--pb-radius);
+    background: var(--pb-bg);
+    box-shadow: 0 10px 30px -12px rgba(0, 0, 0, .6);
+    cursor: text;
+}
+
+.prompt-bar__field::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(140% 120% at 0% 100%, color-mix(in srgb, var(--pb-spark) 26%, transparent), transparent 62%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 500ms ease;
+}
+
+.prompt-bar__field[data-max]::before { opacity: 1; }
+
+.prompt-bar__sparks {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.prompt-bar__input {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    line-height: 22px;
+    resize: none;
+    outline: none;
+    overflow-wrap: anywhere;
+}
+
+.prompt-bar__input::placeholder { color: color-mix(in srgb, var(--pb-ink) 45%, transparent); }
+
+@media (pointer: coarse) {
+    .prompt-bar__input { font-size: 16px; }
+}
+
+.prompt-bar__bar { display: flex; align-items: center; gap: 4px; }
+.prompt-bar__spacer { flex: 1 1 auto; }
+
+.prompt-bar__pick,
+.prompt-bar__send {
+    flex: none;
+    border: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.prompt-bar__pick {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: transparent;
+    color: color-mix(in srgb, var(--pb-ink) 70%, transparent);
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.prompt-bar__pick[data-on] { background: var(--pb-hover); color: var(--pb-ink); }
+
+@media (hover: hover) and (pointer: fine) {
+    .prompt-bar__pick:hover { background: var(--pb-hover); color: var(--pb-ink); }
+}
+
+.prompt-bar__pick[data-max] { color: var(--pb-spark); }
+
+.prompt-bar__menu[data-kind='effort'] {
+    right: auto;
+    width: 248px;
+    padding: 12px 14px 14px;
+    transform-origin: bottom left;
+}
+
+.prompt-bar__effort-head { display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 18px; }
+.prompt-bar__effort-title { color: var(--pb-muted); }
+.prompt-bar__effort-level { font-weight: 500; }
+.prompt-bar__effort-help { display: inline-flex; margin-left: auto; color: var(--pb-muted); }
+
+.prompt-bar__effort-ends {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    color: var(--pb-muted);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.prompt-bar__send {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--pb-ink) 12%, var(--pb-bg));
+    color: color-mix(in srgb, var(--pb-ink) 55%, var(--pb-bg));
+    transition: background-color 200ms ease, color 200ms ease, transform 160ms var(--pb-ease-out);
+}
+
+.prompt-bar__send:disabled { cursor: default; }
+.prompt-bar__send[data-armed] { background: var(--pb-ink); color: var(--pb-bg); }
+.prompt-bar__send[data-pressed] { transform: scale(var(--pb-press)); }
+
+.prompt-bar__glyph { display: block; width: 16px; height: 16px; transform-origin: 50% 50%; }
+
+@media (prefers-reduced-motion: reduce) {
+    .prompt-bar__menu { animation: none; }
+    .prompt-bar__glow { transition: opacity 150ms ease; }
+    .prompt-bar__send[data-pressed] { transform: none; }
+}
+
+.hint {
+    color: #727972;
+    font-size: 11px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* ===== HoldButton (React Bits) ===== */
+.hold-button {
+  --hb-radius: 14px;
+  --hb-bg: #27272a;
+  --hb-fill: #5227ff;
+  --hb-text: #f5f5f5;
+  --hb-fill-text: #ffffff;
+  --hb-hold: 2000ms;
+  --hb-release: 200ms;
+  --hb-press: 0.97;
+  --hb-wave: 6px;
+  --hb-w: 0px;
+  --hb-h: 0px;
+  --hb-cycles: 2;
+  --hb-p: 0;
+  --hb-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --hb-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --hb-glow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 32px -6px color-mix(in srgb, var(--hb-fill) 70%, transparent);
+
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  isolation: isolate;
+  margin: 0;
+  border: 0;
+  border-radius: var(--hb-radius);
+  background: var(--hb-bg);
+  color: var(--hb-text);
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  box-shadow: var(--hb-shadow);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform 160ms var(--hb-ease-out), background-color 160ms ease, box-shadow var(--hb-release) var(--hb-ease-out);
+}
+
+.hold-button--sm { height: 36px; padding: 0 16px; font-size: 13px; }
+.hold-button--md { height: 44px; padding: 0 22px; font-size: 15px; }
+.hold-button--lg { height: 52px; padding: 0 28px; font-size: 17px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .hold-button:not(:disabled):hover { background: color-mix(in srgb, var(--hb-bg) 92%, #fff); }
+}
+
+.hold-button[data-phase='holding'][data-input='pointer'] { transform: scale(var(--hb-press)); }
+
+.hold-button[data-glow='true'][data-phase='holding'],
+.hold-button[data-glow='true'][data-phase='done'] { box-shadow: var(--hb-glow); }
+
+.hold-button[data-glow='true'][data-phase='holding'] {
+  transition: transform 160ms var(--hb-ease-out), background-color 160ms ease, box-shadow var(--hb-hold) linear;
+}
+
+.hold-button:focus-visible { outline: 2px solid var(--hb-fill); outline-offset: 3px; }
+.hold-button:disabled { opacity: 0.5; cursor: default; pointer-events: none; }
+
+.hold-button__pulse {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--hb-radius);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.hold-button[data-glow='true'][data-phase='done'] .hold-button__pulse {
+  animation: hb-pulse 600ms var(--hb-ease-out) forwards;
+}
+
+@keyframes hb-pulse {
+  from { opacity: 1; box-shadow: 0 0 0 0 color-mix(in srgb, var(--hb-fill) 55%, transparent); }
+  to { opacity: 0; box-shadow: 0 0 0 14px color-mix(in srgb, var(--hb-fill) 0%, transparent); }
+}
+
+.hold-button__label { position: relative; z-index: 2; display: grid; place-items: center; }
+
+.hold-button__label > span {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: opacity 200ms ease, filter 200ms ease;
+}
+
+.hold-button__icon { display: inline-flex; flex: none; }
+.hold-button__icon > svg { display: block; }
+
+.hold-button__done { opacity: 0; filter: blur(2px); }
+.hold-button[data-phase='done'] .hold-button__idle { opacity: 0; filter: blur(2px); }
+.hold-button[data-phase='done'] .hold-button__done { opacity: 1; filter: blur(0); }
+
+.hold-button__clip {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  clip-path: inset(0 round var(--hb-radius));
+  pointer-events: none;
+}
+
+.hold-button__fill {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--hb-fill);
+  color: var(--hb-fill-text);
+  clip-path: inset(0 calc((1 - var(--hb-p)) * (100% + 0.75 * var(--hb-wave)) - var(--hb-p) * 0.25 * var(--hb-wave)) 0 0);
+}
+
+.hold-button[data-direction='up'] .hold-button__fill {
+  clip-path: inset(calc((1 - var(--hb-p)) * (100% + 0.75 * var(--hb-wave)) - var(--hb-p) * 0.25 * var(--hb-wave)) 0 0 0);
+}
+
+.hold-button__crest {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--hb-fill);
+  color: var(--hb-fill-text);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='200' viewBox='0 0 20 200' preserveAspectRatio='none'%3E%3Cpath d='M0 0H10C18 8 18 25.3 10 33.3S2 58.7 10 66.7S18 92 10 100S2 125.3 10 133.3S18 158.7 10 166.7S2 192 10 200H0Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='200' viewBox='0 0 20 200' preserveAspectRatio='none'%3E%3Cpath d='M0 0H10C18 8 18 25.3 10 33.3S2 58.7 10 66.7S18 92 10 100S2 125.3 10 133.3S18 158.7 10 166.7S2 192 10 200H0Z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-y;
+  mask-repeat: repeat-y;
+  -webkit-mask-size: var(--hb-wave) calc(var(--hb-h) * 2);
+  mask-size: var(--hb-wave) calc(var(--hb-h) * 2);
+  -webkit-mask-position-x: calc(-1 * var(--hb-wave) + var(--hb-p) * (var(--hb-w) + var(--hb-wave)));
+  mask-position-x: calc(-1 * var(--hb-wave) + var(--hb-p) * (var(--hb-w) + var(--hb-wave)));
+  -webkit-mask-position-y: calc(-1 * var(--hb-p) * var(--hb-cycles) * var(--hb-h));
+  mask-position-y: calc(-1 * var(--hb-p) * var(--hb-cycles) * var(--hb-h));
+}
+
+.hold-button[data-direction='up'] .hold-button__crest {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='20' viewBox='0 0 200 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20V10C12 2 38 2 50 10S88 18 100 10S138 2 150 10S188 18 200 10V20Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='20' viewBox='0 0 200 20' preserveAspectRatio='none'%3E%3Cpath d='M0 20V10C12 2 38 2 50 10S88 18 100 10S138 2 150 10S188 18 200 10V20Z'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: calc(var(--hb-w) * 2) var(--hb-wave);
+  mask-size: calc(var(--hb-w) * 2) var(--hb-wave);
+  -webkit-mask-position-x: calc(-1 * var(--hb-p) * var(--hb-cycles) * var(--hb-w));
+  mask-position-x: calc(-1 * var(--hb-p) * var(--hb-cycles) * var(--hb-w));
+  -webkit-mask-position-y: calc(var(--hb-h) - var(--hb-p) * (var(--hb-h) + var(--hb-wave)));
+  mask-position-y: calc(var(--hb-h) - var(--hb-p) * (var(--hb-h) + var(--hb-wave)));
+}
+
+.hold-button__label--fill { z-index: auto; }
+
+.hold-button__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-contrast: more) {
+  .hold-button { outline: 1px solid var(--hb-text); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hold-button { transition: background-color 160ms ease, box-shadow var(--hb-release) ease; transform: none !important; }
+  .hold-button__fill, .hold-button[data-direction='up'] .hold-button__fill {
+    clip-path: inset(0);
+    opacity: 0;
+    transition: opacity var(--hb-release) ease;
+  }
+  .hold-button__crest { display: none; }
+  .hold-button[data-phase='holding'] .hold-button__fill,
+  .hold-button[data-phase='done'] .hold-button__fill {
+    opacity: 1;
+    transition: opacity var(--hb-hold) linear;
+  }
+  .hold-button__pulse { animation: none !important; }
+  .hold-button__label > span { transition: opacity 200ms ease; filter: none !important; }
+}
+
+/* ===== CometDial (React Bits) ===== */
+.comet-dial {
+  --cd-accent: #f5f5f5;
+  --cd-ink: #fdfdfd;
+  --cd-size: 250px;
+  --cd-figure: 40px;
+
+  position: relative;
+  width: var(--cd-size);
+  height: var(--cd-size);
+  color: var(--cd-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.comet-dial__ring {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+}
+
+.comet-dial[data-dragging] .comet-dial__ring, .comet-dial__ring:active { cursor: grabbing; }
+
+.comet-dial__track, .comet-dial__lit, .comet-dial__comet path { fill: none; stroke-linecap: round; }
+.comet-dial__track { stroke: var(--cd-ink); opacity: 0.24; }
+.comet-dial__lit { stroke: var(--cd-accent); opacity: 0.7; }
+.comet-dial__comet path { stroke: var(--cd-accent); }
+.comet-dial__head { fill: var(--cd-accent); }
+
+.comet-dial__readout { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+
+.comet-dial__value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.06em;
+  font-size: var(--cd-figure);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.comet-dial__unit { font-size: 0.5em; opacity: 0.5; }
+.comet-dial[data-disabled] { opacity: 0.55; }
+.comet-dial[data-disabled] .comet-dial__ring { cursor: default; pointer-events: none; }
+
+.prompt-bar__effort-dial { display: flex; justify-content: center; margin-top: 6px; }
+.prompt-bar__effort-dial .comet-dial__value {
+  display: block;
+  max-width: 96px;
+  font-size: 17px;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-align: center;
+}
+.prompt-bar__effort-dial + .prompt-bar__effort-ends { margin-top: 0; }
+
+/* ===== Markdown в ответах ИИ ===== */
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p { margin: 0 0 10px; }
+.md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
+    margin: 18px 0 8px;
+    line-height: 1.3;
+    font-weight: 700;
+    color: #fff;
+}
+.md h1 { font-size: 1.5em; padding-bottom: 6px; border-bottom: 1px solid rgba(255, 255, 255, .12); }
+.md h2 { font-size: 1.3em; padding-bottom: 5px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.md h3 { font-size: 1.15em; }
+.md h4, .md h5, .md h6 { font-size: 1em; }
+.md ul, .md ol { margin: 6px 0 10px; padding-left: 24px; }
+.md li { margin: 3px 0; }
+.md li > p { margin: 0; }
+.md li::marker { color: var(--green); }
+.md strong { color: #fff; font-weight: 700; }
+.md a { color: var(--green); text-decoration: underline; text-underline-offset: 2px; }
+.md a:hover { color: #65ed86; }
+.md hr { border: 0; border-top: 1px solid rgba(255, 255, 255, .14); margin: 16px 0; }
+.md blockquote {
+    margin: 10px 0;
+    padding: 6px 14px;
+    border-left: 3px solid var(--green);
+    background: rgba(69, 214, 107, .07);
+    border-radius: 0 10px 10px 0;
+    color: #cfd6cf;
+}
+.md code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: .9em;
+    padding: 1px 6px;
+    background: rgba(255, 255, 255, .09);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 6px;
+}
+.md-table-wrap {
+    overflow-x: auto;
+    margin: 10px 0;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, .2);
+}
+.md table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.md th, .md td { padding: 8px 12px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.md th { background: rgba(255, 255, 255, .06); font-weight: 700; }
+.md tr:last-child td { border-bottom: 0; }
+
+/* ===== LatticeLoader (React Bits) ===== */
+.message.assistant.loading {
+    padding: 4px 0;
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.message.assistant > .lattice-loader {
+    color: var(--green);
+}
+
+.lattice-loader {
+  --ll-n: 3;
+  --ll-cell: 6px;
+  --ll-gap: 2px;
+  --ll-font: 14px;
+  --ll-color: currentColor;
+  --ll-mark: #22c55e;
+  --ll-idle: 0.15;
+  --ll-glow: currentColor;
+  --ll-mark-glow: #22c55e;
+  --ll-peak: 1;
+  --ll-cycle: 864ms;
+  --ll-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ll-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--ll-font) * 0.625);
+  font-family: inherit;
+  font-size: var(--ll-font);
+  line-height: 1;
+}
+.lattice-loader__grid { display: grid; flex: none; }
+.lattice-loader__layer {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-columns: repeat(var(--ll-n), var(--ll-cell));
+  gap: var(--ll-gap);
+}
+.lattice-loader__cell {
+  width: var(--ll-cell);
+  height: var(--ll-cell);
+  border-radius: max(1px, calc(var(--ll-cell) * 0.25));
+  background: var(--ll-color);
+  opacity: var(--ll-idle);
+}
+.lattice-loader[data-shape='round'] .lattice-loader__cell { border-radius: 50%; }
+.lattice-loader[data-glow] .lattice-loader__run .lattice-loader__cell:not([data-hole]) {
+  box-shadow: 0 0 calc(var(--ll-cell) * 1.2) calc(var(--ll-cell) * 0.12) var(--ll-glow);
+}
+.lattice-loader[data-glow] .lattice-loader__mark .lattice-loader__cell[data-on] {
+  box-shadow: 0 0 calc(var(--ll-cell) * 1.2) calc(var(--ll-cell) * 0.12) var(--ll-mark-glow);
+}
+.lattice-loader__run { transition: opacity 200ms ease; }
+.lattice-loader__run .lattice-loader__cell {
+  animation: lattice-on var(--ll-cycle) var(--ll-ease-in-out) infinite;
+}
+.lattice-loader__run .lattice-loader__cell[data-lit='45'] { animation-name: lattice-on-45; }
+.lattice-loader__run .lattice-loader__cell[data-lit='35'] { animation-name: lattice-on-35; }
+.lattice-loader__run .lattice-loader__cell[data-lit='25'] { animation-name: lattice-on-25; }
+.lattice-loader__run .lattice-loader__cell[data-hole] {
+  animation: none;
+  opacity: calc(var(--ll-idle) * 0.47);
+}
+.lattice-loader__mark {
+  opacity: 0;
+  transform: scale(0.9);
+  transform-origin: center;
+  transition: opacity 160ms var(--ll-ease-out), transform 160ms var(--ll-ease-out);
+}
+.lattice-loader__mark .lattice-loader__cell {
+  transition: opacity 200ms ease, background-color 200ms ease;
+}
+.lattice-loader__mark .lattice-loader__cell[data-on] {
+  background: var(--ll-mark);
+  opacity: var(--ll-peak);
+}
+.lattice-loader:not([data-status='working']) .lattice-loader__run { opacity: 0; }
+.lattice-loader:not([data-status='working']) .lattice-loader__run .lattice-loader__cell {
+  animation-play-state: paused;
+}
+.lattice-loader:not([data-status='working']) .lattice-loader__mark {
+  opacity: 1;
+  transform: none;
+  transition: opacity 200ms ease, transform 200ms var(--ll-ease-out);
+}
+.lattice-loader__label { position: relative; display: inline-block; font-weight: 500; }
+.lattice-loader__text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  opacity: 0;
+  filter: blur(2px);
+  transition: opacity 200ms ease, filter 200ms ease;
+}
+.lattice-loader__text[data-active] {
+  position: static;
+  opacity: 1;
+  filter: blur(0);
+}
+.lattice-loader__timer {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: calc(var(--ll-font) * 0.875);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+}
+.lattice-loader__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+@keyframes lattice-on {
+  0%, 100% { opacity: var(--ll-idle); }
+  18%, 42% { opacity: var(--ll-peak); }
+  62% { opacity: var(--ll-idle); }
+}
+@keyframes lattice-on-45 {
+  0%, 100% { opacity: var(--ll-idle); }
+  13%, 31% { opacity: var(--ll-peak); }
+  45% { opacity: var(--ll-idle); }
+}
+@keyframes lattice-on-35 {
+  0%, 100% { opacity: var(--ll-idle); }
+  10%, 24% { opacity: var(--ll-peak); }
+  35% { opacity: var(--ll-idle); }
+}
+@keyframes lattice-on-25 {
+  0%, 100% { opacity: var(--ll-idle); }
+  7%, 17% { opacity: var(--ll-peak); }
+  25% { opacity: var(--ll-idle); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lattice-loader__run { --ll-peak: 0.7; }
+  .lattice-loader__run .lattice-loader__cell {
+    animation-delay: 0ms !important;
+    animation-duration: 1400ms !important;
+  }
+  .lattice-loader .lattice-loader__mark { transform: none; }
+  .lattice-loader .lattice-loader__text { filter: none; }
+}
+
+@media(max-width: 600px) {
+    header { padding: 0 15px; }
+    main { padding: 20px 13px; }
+    footer { padding: 12px; }
+    .codebox pre { padding: 12px; }
+}
+</style>
+</head>
+
+<body>
+<div id="bg"></div>
+
+<div class="app">
+
+<header>
+    <div class="logo">Nedohackers<span>AI</span></div>
+    <div id="newChatHost"></div>
+</header>
+
+<main id="main">
+    <div id="messages">
+        <div class="welcome" id="welcome">
+            <h1>Твой <span>ИИ-ассистент</span></h1>
+            Задавай вопросы, пиши код и изучай новое.
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="inputwrap">
+        <div class="prompt-bar" id="promptbar">
+            <div class="prompt-bar__field" id="pbField">
+                <canvas class="prompt-bar__sparks" id="pbSparks" aria-hidden="true"></canvas>
+                <textarea class="prompt-bar__input" id="input" rows="1"
+                    placeholder="Напиши сообщение..." aria-label="Сообщение"></textarea>
+                <div class="prompt-bar__bar">
+                    <button type="button" class="prompt-bar__pick" id="pbEffort" aria-label="Уровень усилия" aria-expanded="false">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+                            <path d="M10 3l1.9 5.6L17.5 10.5l-5.6 1.9L10 18l-1.9-5.6L2.5 10.5l5.6-1.9L10 3z"></path>
+                            <path d="M18.5 3v4M16.5 5h4"></path>
+                            <path d="M19 16v4M17 18h4"></path>
+                        </svg>
+                        <span id="pbEffortLabel">Высокий</span>
+                    </button>
+                    <span class="prompt-bar__spacer"></span>
+                    <button type="button" class="prompt-bar__send" id="send" disabled aria-label="Отправить">
+                        <svg class="prompt-bar__glyph" id="sendGlyph" viewBox="0 0 24 24" aria-hidden="true"
+                            fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+                            <path id="sendPath" d=""></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="hint">NedohackersAI · Бесплатные модели OpenRouter</div>
+    </div>
+</footer>
+
+</div>
+
+<script>
+// Адрес твоего Cloudflare Worker (ключ OpenRouter хранится только в нём)
+const WORKER_URL = "https://nedohackers-proxy.t1kodiai.workers.dev";
+
+const messages = document.getElementById("messages");
+const main = document.getElementById("main");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+
+const history = [];
+const welcomeHTML = messages.innerHTML;
+
+function escapeHTML(text) {
+    return text.replace(/[&<>"']/g, ch => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[ch]);
+}
+
+function addMessage(role, text = "") {
+    document.getElementById("welcome")?.remove();
+
+    const el = document.createElement("div");
+    el.className = "message " + role;
+    messages.appendChild(el);
+
+    if (role === "user") {
+        el.textContent = text;
+    } else {
+        renderAnswer(el, text);
+    }
+
+    main.scrollTop = main.scrollHeight;
+    return el;
+}
+
+/* ===== Markdown -> DOM (безопасно, без innerHTML) ===== */
+const MD_SEP = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+const MD_LIST = /^(\s*)([-*+]|\d+[.)])\s+(.*)$/;
+const MD_HR = /^\s*([-*_])(\s*\1){2,}\s*$/;
+
+function mdEl(tag, cls) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    return e;
+}
+
+function mdSafeUrl(u) {
+    try {
+        const url = new URL(u, "https://example.invalid");
+        if (["http:", "https:", "mailto:"].includes(url.protocol)) return u;
+    } catch (err) {}
+    return null;
+}
+
+function mdText(parent, text) {
+    const bits = text.split("\n");
+    bits.forEach((bit, i) => {
+        if (i) parent.appendChild(document.createElement("br"));
+        if (bit) parent.appendChild(document.createTextNode(bit));
+    });
+}
+
+function mdInline(parent, text) {
+    const re = /(`+)([\s\S]*?[^`])\1(?!`)|\[([^\]]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)|\*\*([\s\S]+?)\*\*|~~([\s\S]+?)~~|\*([^\s*][^*]*?)\*|(https?:\/\/[^\s<]+[^\s<.,;:!?)\]])/g;
+    let last = 0, m;
+    while ((m = re.exec(text))) {
+        if (m.index > last) mdText(parent, text.slice(last, m.index));
+        if (m[2] !== undefined) {
+            const c = mdEl("code");
+            c.textContent = m[2];
+            parent.appendChild(c);
+        } else if (m[3] !== undefined) {
+            const url = mdSafeUrl(m[4]);
+            if (url) {
+                const a = mdEl("a");
+                a.href = url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                mdInline(a, m[3]);
+                parent.appendChild(a);
+            } else {
+                mdText(parent, m[0]);
+            }
+        } else if (m[5] !== undefined) {
+            const b = mdEl("strong");
+            mdInline(b, m[5]);
+            parent.appendChild(b);
+        } else if (m[6] !== undefined) {
+            const d = mdEl("del");
+            mdInline(d, m[6]);
+            parent.appendChild(d);
+        } else if (m[7] !== undefined) {
+            const i = mdEl("em");
+            mdInline(i, m[7]);
+            parent.appendChild(i);
+        } else if (m[8] !== undefined) {
+            const a = mdEl("a");
+            a.href = m[8];
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = m[8];
+            parent.appendChild(a);
+        }
+        last = re.lastIndex;
+    }
+    if (last < text.length) mdText(parent, text.slice(last));
+}
+
+function mdStartsBlock(lines, i) {
+    const l = lines[i];
+    return /^#{1,6}\s+/.test(l) || MD_HR.test(l) || /^\s*>/.test(l) || MD_LIST.test(l) ||
+        (l.includes("|") && i + 1 < lines.length && MD_SEP.test(lines[i + 1]));
+}
+
+function mdSplitRow(line) {
+    let t = line.trim();
+    if (t.startsWith("|")) t = t.slice(1);
+    if (t.endsWith("|")) t = t.slice(0, -1);
+    return t.split("|").map(c => c.trim());
+}
+
+function mdList(lines, i, container) {
+    const first = MD_LIST.exec(lines[i]);
+    const base = first[1].length;
+    const ordered = /\d/.test(first[2]);
+    const list = document.createElement(ordered ? "ol" : "ul");
+    if (ordered) {
+        const startNum = parseInt(first[2], 10);
+        if (startNum > 1) list.start = startNum;
+    }
+    let li = null, sub = [];
+
+    const flush = () => {
+        if (!li) return;
+        if (sub.length) {
+            const indents = sub.filter(l => l.trim()).map(l => l.match(/^\s*/)[0].length);
+            const min = indents.length ? Math.min(...indents) : 0;
+            renderMarkdown(li, sub.map(l => l.slice(min)).join("\n"));
+        }
+        list.appendChild(li);
+        li = null;
+        sub = [];
+    };
+
+    while (i < lines.length) {
+        const line = lines[i];
+        const m = MD_LIST.exec(line);
+
+        if (m && m[1].length <= base) {
+            if (m[1].length === base && /\d/.test(m[2]) !== ordered) break;
+            flush();
+            li = document.createElement("li");
+            mdInline(li, m[3]);
+            i++;
+            continue;
+        }
+
+        if (!line.trim()) {
+            let j = i + 1;
+            while (j < lines.length && !lines[j].trim()) j++;
+            if (j < lines.length) {
+                const nm = MD_LIST.exec(lines[j]);
+                const ind = lines[j].match(/^\s*/)[0].length;
+                if (ind > base || (nm && ind === base && /\d/.test(nm[2]) === ordered)) {
+                    if (li && ind > base) sub.push("");
+                    i = j;
+                    continue;
+                }
+            }
+            break;
+        }
+
+        if (li && line.match(/^\s*/)[0].length > base) {
+            sub.push(line);
+            i++;
+            continue;
+        }
+        break;
+    }
+    flush();
+    container.appendChild(list);
+    return i;
+}
+
+function renderMarkdown(container, src) {
+    const lines = src.replace(/\r\n?/g, "\n").split("\n");
+    let i = 0;
+
+    while (i < lines.length) {
+        const line = lines[i];
+
+        if (!line.trim()) { i++; continue; }
+
+        let m = /^(#{1,6})\s+(.*?)\s*$/.exec(line);
+        if (m) {
+            const h = document.createElement("h" + m[1].length);
+            mdInline(h, m[2].replace(/\s+#+\s*$/, ""));
+            container.appendChild(h);
+            i++;
+            continue;
+        }
+
+        if (MD_HR.test(line)) {
+            container.appendChild(document.createElement("hr"));
+            i++;
+            continue;
+        }
+
+        if (line.includes("|") && i + 1 < lines.length && MD_SEP.test(lines[i + 1])) {
+            const head = mdSplitRow(line);
+            const aligns = mdSplitRow(lines[i + 1]).map(c =>
+                /^:-+:$/.test(c) ? "center" : /^-+:$/.test(c) ? "right" : "left");
+            const wrap = mdEl("div", "md-table-wrap");
+            const table = document.createElement("table");
+            const thead = document.createElement("thead");
+            const hr = document.createElement("tr");
+            head.forEach((cell, c) => {
+                const th = document.createElement("th");
+                th.style.textAlign = aligns[c] || "left";
+                mdInline(th, cell);
+                hr.appendChild(th);
+            });
+            thead.appendChild(hr);
+            table.appendChild(thead);
+            const tbody = document.createElement("tbody");
+            i += 2;
+            while (i < lines.length && lines[i].trim() && lines[i].includes("|")) {
+                const cells = mdSplitRow(lines[i]);
+                const tr = document.createElement("tr");
+                head.forEach((_, c) => {
+                    const td = document.createElement("td");
+                    td.style.textAlign = aligns[c] || "left";
+                    mdInline(td, cells[c] || "");
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+                i++;
+            }
+            table.appendChild(tbody);
+            wrap.appendChild(table);
+            container.appendChild(wrap);
+            continue;
+        }
+
+        if (/^\s*>/.test(line)) {
+            const buf = [];
+            while (i < lines.length && /^\s*>/.test(lines[i])) {
+                buf.push(lines[i].replace(/^\s*>\s?/, ""));
+                i++;
+            }
+            const q = document.createElement("blockquote");
+            renderMarkdown(q, buf.join("\n"));
+            container.appendChild(q);
+            continue;
+        }
+
+        if (MD_LIST.test(line)) {
+            i = mdList(lines, i, container);
+            continue;
+        }
+
+        const buf = [line];
+        i++;
+        while (i < lines.length && lines[i].trim() && !mdStartsBlock(lines, i)) {
+            buf.push(lines[i]);
+            i++;
+        }
+        const p = document.createElement("p");
+        mdInline(p, buf.join("\n"));
+        container.appendChild(p);
+    }
+}
+
+function renderAnswer(container, text) {
+    container.replaceChildren();
+
+    // Разбираем блоки кода и обычный текст.
+    const parts = text.split(
+        /```([^\n`]*)\n?([\s\S]*?)```/g
+    );
+
+    for (let i = 0; i < parts.length; ) {
+        const plain = parts[i++];
+        if (plain) {
+            const p = document.createElement("div");
+            p.className = "md";
+            renderMarkdown(p, plain);
+            container.appendChild(p);
+        }
+
+        if (i >= parts.length) break;
+
+        const language = parts[i++] || "code";
+        const code = parts[i++] || "";
+
+        const box = document.createElement("div");
+        box.className = "codebox";
+
+        const head = document.createElement("div");
+        head.className = "codehead";
+
+        const label = document.createElement("span");
+        label.className = "codetitle";
+        label.textContent = language.trim() || "code";
+
+        const copy = document.createElement("button");
+        copy.className = "copy";
+        copy.textContent = "Копировать";
+        copy.type = "button";
+
+        copy.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(code);
+                copy.textContent = "Скопировано!";
+                setTimeout(() => copy.textContent = "Копировать", 1500);
+            } catch {
+                copy.textContent = "Не удалось";
+            }
+        });
+
+        head.append(label, copy);
+
+        const pre = document.createElement("pre");
+        const codeEl = document.createElement("code");
+
+        const langMap = {
+            js: "javascript",
+            jsx: "javascript",
+            ts: "typescript",
+            py: "python",
+            html: "xml",
+            sh: "bash",
+            shell: "bash",
+            yml: "yaml"
+        };
+
+        const lang = langMap[language.trim().toLowerCase()]
+            || language.trim().toLowerCase();
+
+        if (hljs.getLanguage(lang)) {
+            codeEl.className = "language-" + lang;
+        }
+
+        codeEl.textContent = code;
+        pre.appendChild(codeEl);
+        box.append(head, pre);
+        container.appendChild(box);
+
+        if (codeEl.className) hljs.highlightElement(codeEl);
+    }
+
+    main.scrollTop = main.scrollHeight;
+}
+
+/* ===== LatticeLoader (React Bits), порт на чистый JS ===== */
+const LL_PATTERNS = {
+  arrow: { 3: { cells: [1, 2, 3, 0, 1, 2, 1, 2, 3], loop: 7.2, scale: 1 } },
+  dots: { 3: { cells: [0, 1, 2, 0, 1, 2, 0, 1, 2], loop: 3, scale: 2.4 } },
+  ripple: { 3: { cells: [2, 1, 2, 1, 0, 1, 2, 1, 2], loop: 4.8, scale: 1.5 } },
+  spiral: { 3: { cells: [0, 1, 2, 7, 8, 3, 6, 5, 4], loop: 9, scale: 1.2, lit: 0.35 } },
+  orbit: {
+    3: { cells: [0, 1, 2, 7, null, 3, 6, 5, 4], loop: 8, scale: 1.2 },
+    4: { cells: [0, 1, 2, 3, 11, null, null, 4, 10, null, null, 5, 9, 8, 7, 6], loop: 6, scale: 1.2, lit: 0.45 }
+  },
+  snake: {
+    3: { cells: [0, 1, 2, 5, 4, 3, 6, 7, 8], loop: 9, scale: 1, lit: 0.35 },
+    4: { cells: [0, 1, 2, 3, 7, 6, 5, 4, 8, 9, 10, 11, 15, 14, 13, 12], loop: 16, scale: 1, lit: 0.25 }
+  },
+  sweep: { 4: { cells: [0, 1, 2, 3, 1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6], loop: 5, scale: 1, lit: 0.45 } },
+  spin: { 4: { cells: [0, 0, 1, 1, 0, 0, 1, 1, 3, 3, 2, 2, 3, 3, 2, 2], loop: 4, scale: 1.6, lit: 0.35 } },
+  rain: { 4: { cells: [0, 2, 1, 3, 1, 3, 2, 4, 2, 4, 3, 5, 3, 5, 4, 6], loop: 4, scale: 1.2, lit: 0.35 } },
+  pulse: { 4: { cells: [2, 1, 1, 2, 1, 0, 0, 1, 1, 0, 0, 1, 2, 1, 1, 2], loop: 2.4, scale: 2.5, lit: 0.45 } }
+};
+const LL_DEFAULT = { 3: "orbit", 4: "sweep" };
+const LL_MARKS = {
+  3: { done: [2, 3, 5, 7], error: [0, 2, 4, 6, 8] },
+  4: { done: [7, 8, 10, 13], error: [0, 3, 5, 6, 9, 10, 12, 15] }
+};
+
+function llResolve(pattern, grid) {
+    if (typeof pattern === "string") {
+        const named = LL_PATTERNS[pattern];
+        return (named && named[grid]) || LL_PATTERNS[LL_DEFAULT[grid]][grid];
+    }
+    const cells = Array.from({ length: grid * grid }, (_, i) => pattern.cells[i] ?? null);
+    const max = Math.max(0, ...cells.filter(v => v != null));
+    return { cells, loop: pattern.loop ?? max + 4.2, scale: pattern.scale ?? 1, lit: pattern.lit ?? 0.62 };
+}
+
+function llFmt(ds) {
+    return ds < 600
+        ? (ds / 10).toFixed(1) + "s"
+        : Math.floor(ds / 600) + "m " + ((ds % 600) / 10).toFixed(1) + "s";
+}
+
+function llEl(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+}
+
+function createLatticeLoader(options = {}) {
+    const o = {
+        label: "Thinking", doneLabel: "Done in", errorLabel: "Failed after",
+        pattern: "orbit", grid: 3, shape: "round", color: "currentColor",
+        doneColor: "#22c55e", errorColor: "#ef4444",
+        cellSize: 6, gap: 2, fontSize: 14, step: 90, idleOpacity: 0.15,
+        glow: false, glowColor: "", showTimer: true,
+        ...options
+    };
+
+    const n = o.grid === 4 ? 4 : 3;
+    const pat = llResolve(o.pattern, n);
+    const marks = LL_MARKS[n];
+    const d = o.step * pat.scale;
+    const cycle = Math.round(pat.loop * d);
+
+    const root = llEl("span", "lattice-loader");
+    root.setAttribute("role", "status");
+    root.dataset.status = "working";
+    root.dataset.shape = o.shape;
+    if (o.glow) root.setAttribute("data-glow", "");
+
+    const vars = {
+        "--ll-n": n,
+        "--ll-cell": o.cellSize + "px",
+        "--ll-gap": o.gap + "px",
+        "--ll-font": o.fontSize + "px",
+        "--ll-color": o.color,
+        "--ll-mark": o.doneColor,
+        "--ll-idle": o.idleOpacity,
+        "--ll-glow": o.glowColor || o.color,
+        "--ll-mark-glow": o.glowColor || o.doneColor,
+        "--ll-cycle": cycle + "ms"
+    };
+    for (const k in vars) root.style.setProperty(k, vars[k]);
+
+    const gridEl = llEl("span", "lattice-loader__grid");
+    gridEl.setAttribute("aria-hidden", "true");
+
+    const run = llEl("span", "lattice-loader__layer lattice-loader__run");
+    pat.cells.forEach(unit => {
+        const c = llEl("span", "lattice-loader__cell");
+        if (unit == null) {
+            c.setAttribute("data-hole", "");
+        } else {
+            c.style.animationDelay = Math.round(unit * d) + "ms";
+        }
+        if (pat.lit && pat.lit !== 0.62) c.dataset.lit = Math.round(pat.lit * 100);
+        run.appendChild(c);
+    });
+
+    const markLayer = llEl("span", "lattice-loader__layer lattice-loader__mark");
+    const markCells = pat.cells.map(() => {
+        const c = llEl("span", "lattice-loader__cell");
+        markLayer.appendChild(c);
+        return c;
+    });
+
+    gridEl.append(run, markLayer);
+
+    const labelEl = llEl("span", "lattice-loader__label");
+    labelEl.setAttribute("aria-hidden", "true");
+    const texts = {
+        working: llEl("span", "lattice-loader__text", o.label),
+        done: llEl("span", "lattice-loader__text", o.doneLabel),
+        error: llEl("span", "lattice-loader__text", o.errorLabel)
+    };
+    labelEl.append(texts.working, texts.done, texts.error);
+
+    const timerEl = o.showTimer ? llEl("span", "lattice-loader__timer", "0.0s") : null;
+    if (timerEl) timerEl.setAttribute("aria-hidden", "true");
+
+    const sr = llEl("span", "lattice-loader__sr", o.label + ", in progress");
+
+    root.append(gridEl, labelEl);
+    if (timerEl) root.appendChild(timerEl);
+    root.appendChild(sr);
+
+    let ds = 0;
+    let timerId = null;
+    let lastMark = "done";
+
+    function paint(v) {
+        ds = v;
+        if (timerEl) timerEl.textContent = llFmt(ds);
+    }
+
+    function startClock() {
+        const startedAt = performance.now();
+        paint(0);
+        timerId = setInterval(() => paint(Math.floor((performance.now() - startedAt) / 100)), 100);
+    }
+
+    function stopClock() {
+        if (timerId) clearInterval(timerId);
+        timerId = null;
+    }
+
+    function setStatus(status) {
+        root.dataset.status = status;
+        if (status !== "working") lastMark = status;
+        const mark = status === "working" ? lastMark : status;
+
+        markCells.forEach((c, i) => {
+            if (marks[mark].includes(i)) c.setAttribute("data-on", "");
+            else c.removeAttribute("data-on");
+        });
+
+        const markColor = status === "error" ? o.errorColor : o.doneColor;
+        root.style.setProperty("--ll-mark", markColor);
+        root.style.setProperty("--ll-mark-glow", o.glowColor || markColor);
+
+        texts.working.toggleAttribute("data-active", status === "working");
+        texts.done.toggleAttribute("data-active", status === "done");
+        texts.error.toggleAttribute("data-active", status === "error");
+
+        if (status === "working") {
+            sr.textContent = o.label + ", in progress";
+            if (!timerId) startClock();
+        } else {
+            stopClock();
+            sr.textContent = (status === "done" ? o.doneLabel : o.errorLabel) +
+                (o.showTimer ? " " + llFmt(ds) : "");
+        }
+    }
+
+    texts.working.setAttribute("data-active", "");
+    setStatus("working");
+
+    return { el: root, setStatus, destroy: stopClock };
+}
+
+/* ===== PromptBar (React Bits), на чистом JS ===== */
+const BASE_PROMPT =
+    "Ты полезный ИИ-ассистент. " +
+    "Если пишешь код, всегда помещай его в Markdown-блок с указанием языка, " +
+    "например ```python. Отвечай на языке пользователя.";
+
+// Ползунок усилия: чем выше уровень, тем подробнее инструкция для модели
+const EFFORTS = [
+    {
+        label: "Низкий",
+        prompt:
+            "Режим: БЫСТРО. Отвечай коротко и по делу: сразу суть, без вступлений " +
+            "и лишних пояснений. Подробности давай только если о них просят."
+    },
+    {
+        label: "Средний",
+        prompt:
+            "Режим: СБАЛАНСИРОВАННО. Дай чёткий и понятный ответ нормальной длины: " +
+            "сначала главное, затем необходимые пояснения и короткий пример, если он помогает."
+    },
+    {
+        label: "Высокий",
+        prompt:
+            "Режим: ГЛУБОКО. Прежде чем отвечать, внимательно разберись в вопросе и учти его контекст. " +
+            "Рассуждай по шагам, проверяй факты и логику, давай полный, точный и хорошо " +
+            "структурированный ответ с примерами."
+    },
+    {
+        label: "Очень высокий",
+        prompt:
+            "Режим: ОЧЕНЬ ГЛУБОКО. Сначала про себя разбери задачу на части, найди неочевидные нюансы " +
+            "и крайние случаи, рассмотри несколько подходов и выбери лучший. Перед ответом перепроверь " +
+            "вывод на ошибки. В ответе объясни ход решения и обоснуй выбор. Если для точного ответа " +
+            "не хватает данных, явно назови свои допущения."
+    },
+    {
+        label: "Макс",
+        prompt:
+            "Режим: МАКСИМУМ. Работай как эксперт высшего уровня. Подробно разбери задачу пошагово, " +
+            "рассмотри альтернативные решения и их компромиссы, найди возможные ошибки и подводные камни, " +
+            "затем независимо перепроверь итог. Ответ должен быть исчерпывающим, точным и структурированным: " +
+            "краткий итог, подробное решение с обоснованием, примеры, риски и рекомендации. " +
+            "Для кода: рабочий, аккуратный код с обработкой ошибок и крайних случаев. " +
+            "Не выдумывай факты: если не уверен, так и скажи."
+    }
+];
+const NO_MODE_NOTE = " Не упоминай название режима в ответе.";
+
+const COMMANDS = [
+    { name: "/кратко", description: "Коротко о главном",
+      prompt: "Сделай краткое резюме: выдели главное в нескольких пунктах. Если ниже есть текст, резюмируй его, иначе резюмируй наш диалог." },
+    { name: "/сравни", description: "Два варианта рядом",
+      prompt: "Сравни варианты ниже бок о бок по ключевым критериям и сделай вывод." },
+    { name: "/черновик", description: "Первая версия текста",
+      prompt: "Напиши первую версию (черновик) по описанию ниже." },
+    { name: "/объясни", description: "Простое объяснение",
+      prompt: "Объясни простым языком, шаг за шагом и с примером:" },
+    { name: "/задачи", description: "Превратить в список дел",
+      prompt: "Преврати это в список задач (to-do) с приоритетами:" }
+];
+
+function buildSystemPrompt() {
+    return BASE_PROMPT + "\n\n" + EFFORTS[effortIndex].prompt + NO_MODE_NOTE;
+}
+
+function expandCommand(text) {
+    const m = /^\/([\p{L}\d_-]+)(?:\s+([\s\S]*))?$/u.exec(text);
+    if (!m) return text;
+    const cmd = COMMANDS.find(c => c.name.slice(1).toLowerCase() === m[1].toLowerCase());
+    if (!cmd) return text;
+    return cmd.prompt + (m[2] ? "\n\n" + m[2] : "");
+}
+
+/* ----- кнопка отправки: стрелка -> стоп ----- */
+const ARROW_UP = [12, 4.5, 18.5, 11, 14.25, 11, 14.25, 19.5, 9.75, 19.5, 9.75, 11, 5.5, 11];
+const SQUARE = [12, 6, 18, 6, 18, 12, 18, 18, 6, 18, 6, 12, 6, 6];
+const MORPH_MS = 240, SQUASH = 0.12, TILT = 8, LINE = 22, MAX_ROWS = 5;
+const SPARK_COLOR = "#45d66b", SPARK_BOOST = 1;
+const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+
+function pathAt(a, b, t) {
+    let d = "";
+    for (let i = 0; i < a.length; i += 2) {
+        d += (i ? "L" : "M") +
+            (a[i] + (b[i] - a[i]) * t).toFixed(2) + " " +
+            (a[i + 1] + (b[i + 1] - a[i + 1]) * t).toFixed(2);
+    }
+    return d + "Z";
+}
+
+function cubicBezier(x1, y1, x2, y2) {
+    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    const sx = t => ((ax * t + bx) * t + cx) * t;
+    const sy = t => ((ay * t + by) * t + cy) * t;
+    const dx = t => (3 * ax * t + 2 * bx) * t + cx;
+    return x => {
+        let t = x;
+        for (let i = 0; i < 8; i++) {
+            const e = sx(t) - x;
+            if (Math.abs(e) < 1e-5) break;
+            const d = dx(t);
+            if (Math.abs(d) < 1e-6) break;
+            t -= e / d;
+        }
+        return sy(t);
+    };
+}
+
+const easeMorph = cubicBezier(0.77, 0, 0.175, 1);
+const sendGlyph = document.getElementById("sendGlyph");
+const sendPath = document.getElementById("sendPath");
+let morphT = 0, morphDir = -1, morphRaf = 0;
+
+function paintGlyph(v) {
+    sendPath.setAttribute("d", pathAt(ARROW_UP, SQUARE, v));
+    const goo = reduceMotion ? 0 : Math.sin(v * Math.PI);
+    const sx = 1 - SQUASH * goo;
+    sendGlyph.style.transform = goo
+        ? "rotate(" + (morphDir * TILT * goo) + "deg) scale(" + sx + ", " + (1 / sx) + ")"
+        : "";
+}
+
+function morphTo(target) {
+    cancelAnimationFrame(morphRaf);
+    morphDir = target ? 1 : -1;
+    const from = morphT;
+    if (from === target) return;
+    if (reduceMotion) {
+        morphT = target;
+        paintGlyph(target);
+        return;
+    }
+    const start = performance.now();
+    const step = now => {
+        const k = Math.min(1, (now - start) / MORPH_MS);
+        morphT = from + (target - from) * easeMorph(k);
+        paintGlyph(morphT);
+        if (k < 1) morphRaf = requestAnimationFrame(step);
+    };
+    morphRaf = requestAnimationFrame(step);
+}
+
+paintGlyph(0);
+
+/* ----- состояние поля ----- */
+const pbRoot = document.getElementById("promptbar");
+const pbField = document.getElementById("pbField");
+const pbSparks = document.getElementById("pbSparks");
+const pbEffort = document.getElementById("pbEffort");
+const pbEffortLabel = document.getElementById("pbEffortLabel");
+
+let busy = false;
+let controller = null;
+let effortIndex = Math.floor((EFFORTS.length - 1) / 2);
+let effortOpen = false;
+let dismissed = false;
+let active = 0;
+
+let menuEl = null, menuKind = null, menuQuery = null, glowEl = null;
+let rowEls = [], slashList = [];
+let effortDial = null, effortLevelEl = null;
+
+const typing = { energy: 0, strokes: 0 };
+
+function updateSend() {
+    const armed = busy || input.value.trim().length > 0;
+    send.disabled = !armed;
+    send.toggleAttribute("data-armed", armed);
+}
+
+function autoGrow() {
+    input.style.height = "0px";
+    const max = LINE * MAX_ROWS;
+    input.style.height = Math.min(input.scrollHeight, max) + "px";
+    input.style.overflowY = input.scrollHeight > max ? "auto" : "hidden";
+}
+
+function setBusy(v) {
+    busy = v;
+    updateSend();
+    morphTo(v ? 1 : 0);
+}
+
+/* ----- искры на максимальном усилии ----- */
+let sparksStop = null;
+
+function startSparks() {
+    if (sparksStop || reduceMotion) return;
+    const canvas = pbSparks;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    typing.strokes = 0;
+    let raf = 0, last = performance.now();
+    let w = 0, h = 0, due = 0, speed = 1, pulse = 0;
+    const parts = [];
+
+    const resize = () => {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        w = rect.width;
+        h = rect.height;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const spawn = burst => {
+        parts.push({
+            x: Math.random() * w,
+            y: burst ? h * (0.2 + Math.random() * 0.8) : h + 3,
+            r: 0.9 + Math.random() * 1.1,
+            vy: -(7 + Math.random() * 9),
+            sway: (Math.random() - 0.5) * 10,
+            phase: Math.random() * Math.PI * 2,
+            life: burst ? Math.random() * 1.2 : 0,
+            span: 2.4 + Math.random() * 2.4
+        });
+    };
+
+    const tick = now => {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        typing.energy *= Math.exp(-dt / 0.8);
+        pulse *= Math.exp(-dt / 0.16);
+        if (typing.strokes > 0) {
+            typing.strokes = 0;
+            if (SPARK_BOOST > 0) pulse = 1;
+        }
+        const energy = typing.energy * SPARK_BOOST;
+        speed += (1 + energy * 6 - speed) * (1 - Math.exp(-dt / 0.15));
+        due += dt;
+        while (due > 0.14) {
+            due -= 0.14;
+            if (parts.length < 30) spawn(false);
+        }
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = SPARK_COLOR;
+        ctx.shadowColor = SPARK_COLOR;
+        ctx.shadowBlur = 6 + energy * 10 + pulse * 6;
+        for (let i = parts.length - 1; i >= 0; i -= 1) {
+            const p = parts[i];
+            p.life += dt;
+            if (p.life > p.span) {
+                parts.splice(i, 1);
+                continue;
+            }
+            const k = p.life / p.span;
+            const twinkle = 0.7 + 0.3 * Math.sin((now / 160) * (1 + energy) + p.phase);
+            p.y += p.vy * dt * speed;
+            if (p.y < -4) {
+                p.y = h + 3;
+                p.x = Math.random() * w;
+            }
+            const edge = Math.min(1, Math.max(0, p.y / 14), Math.max(0, (h - p.y) / 14));
+            ctx.globalAlpha = Math.min(1, Math.sin(k * Math.PI) * (0.9 + energy * 0.25) * twinkle) * edge;
+            ctx.beginPath();
+            ctx.arc(
+                p.x + Math.sin((now / 900) * (1 + energy * 0.8) + p.phase) * p.sway,
+                p.y,
+                p.r * twinkle * (1 + energy * 0.35),
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+        raf = requestAnimationFrame(tick);
+    };
+
+    resize();
+    for (let i = 0; i < 26; i += 1) spawn(true);
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+    raf = requestAnimationFrame(tick);
+
+    sparksStop = () => {
+        cancelAnimationFrame(raf);
+        ro.disconnect();
+        ctx.clearRect(0, 0, w, h);
+    };
+}
+
+function stopSparks() {
+    if (sparksStop) sparksStop();
+    sparksStop = null;
+}
+
+/* ----- кольцо усилия (CometDial, React Bits) ----- */
+function updateEffortUI() {
+    const n = EFFORTS.length;
+    const level = EFFORTS[effortIndex].label;
+    const maxed = n > 1 && effortIndex === n - 1;
+
+    pbEffortLabel.textContent = level;
+    pbRoot.toggleAttribute("data-max", maxed);
+    pbField.toggleAttribute("data-max", maxed);
+    pbEffort.toggleAttribute("data-max", maxed);
+
+    if (effortLevelEl) effortLevelEl.textContent = level;
+
+    if (maxed) startSparks(); else stopSparks();
+}
+
+function setEffort(i) {
+    const next = Math.max(0, Math.min(EFFORTS.length - 1, Math.round(i)));
+    if (next === effortIndex) return;
+    effortIndex = next;
+    updateEffortUI();
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const cdClamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const cdDecimals = step => {
+    const s = String(step);
+    const i = s.indexOf(".");
+    return i === -1 ? 0 : s.length - i - 1;
+};
+const cdVelocityOf = hist => {
+    if (hist.length < 2) return 0;
+    const a = hist[0];
+    const b = hist[hist.length - 1];
+    return ((b[1] - a[1]) / Math.max(1, b[0] - a[0])) * 1000;
+};
+const CD_R = 80;
+const cdPointAt = deg => {
+    const a = (deg * Math.PI) / 180;
+    return [100 + Math.cos(a) * CD_R, 100 + Math.sin(a) * CD_R];
+};
+const cdArcPath = (a0, a1) => {
+    const p0 = cdPointAt(a0);
+    const p1 = cdPointAt(a1);
+    return "M " + p0[0].toFixed(3) + " " + p0[1].toFixed(3) +
+        " A " + CD_R + " " + CD_R + " 0 " + (a1 - a0 > 180 ? 1 : 0) + " 1 " +
+        p1[0].toFixed(3) + " " + p1[1].toFixed(3);
+};
+
+function createCometDial(options) {
+    const o = Object.assign({
+        value: 0, min: 0, max: 100, step: 1, unit: "", label: "Level",
+        accent: "#f5f5f5", ink: "#fdfdfd", size: 250, sweep: 320, thickness: 5,
+        speed: 25, tapBounce: 0.2, flickBounce: 0.1, momentum: 1,
+        cometReach: 180, cometWidth: 12, disabled: false,
+        format: null, valueText: null, onChange: null, onChangeEnd: null
+    }, options);
+
+    const { min, max, step, unit, sweep, thickness, cometReach, cometWidth, momentum, tapBounce, flickBounce } = o;
+    const DEAD = 44, K = 12, V_FULL = 4, V_FLICK = 2;
+    const TAU_FOLLOW = 0.06, TAU_V = 0.05, DECEL = 0.99, DRAG_PX = 10, STALE_MS = 80;
+
+    const range = Math.max(1e-9, max - min);
+    const gap = 360 - sweep;
+    const start = 90 + gap / 2;
+    const end = start + sweep;
+    const decimals = cdDecimals(step);
+    const kStiff = 200 + (cdClamp(o.speed, 0, 100) / 100) * 700;
+    const crit = 2 * Math.sqrt(kStiff);
+    const snap = v => (step > 0
+        ? cdClamp(Math.round((v - min) / step) * step + min, min, max)
+        : cdClamp(v, min, max));
+
+    let target = snap(o.value);
+    const spring = { x: target, v: 0, to: target, k: kStiff, c: crit, active: false };
+    let grip = null;
+    let unbind = null;
+    const L = { raf: 0, last: performance.now(), v: 0, rPrev: null, text: "", num: "", valueText: "" };
+
+    /* --- DOM --- */
+    const root = document.createElement("div");
+    root.className = "comet-dial";
+    root.style.setProperty("--cd-accent", o.accent);
+    root.style.setProperty("--cd-ink", o.ink);
+    root.style.setProperty("--cd-size", o.size + "px");
+    root.style.setProperty("--cd-figure", Math.round(o.size * 0.16) + "px");
+    if (o.disabled) root.setAttribute("data-disabled", "");
+
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("class", "comet-dial__ring");
+    svg.setAttribute("viewBox", "0 0 200 200");
+    svg.setAttribute("role", "slider");
+    svg.setAttribute("tabindex", o.disabled ? "-1" : "0");
+    svg.setAttribute("aria-label", o.label);
+    svg.setAttribute("aria-valuemin", min);
+    svg.setAttribute("aria-valuemax", max);
+
+    const mk = (tag, cls) => {
+        const e = document.createElementNS(SVG_NS, tag);
+        if (cls) e.setAttribute("class", cls);
+        return e;
+    };
+
+    const trackEl = mk("path", "comet-dial__track");
+    trackEl.setAttribute("d", cdArcPath(start, end));
+    trackEl.setAttribute("stroke-width", thickness);
+    const litEl = mk("path", "comet-dial__lit");
+    litEl.setAttribute("stroke-width", thickness);
+    const cometG = mk("g", "comet-dial__comet");
+    const comet = [];
+    for (let j = 0; j < K; j++) {
+        const p = document.createElementNS(SVG_NS, "path");
+        p.style.opacity = "0";
+        cometG.appendChild(p);
+        comet.push(p);
+    }
+    const headEl = mk("circle", "comet-dial__head");
+    headEl.setAttribute("r", thickness * 1.8);
+    svg.append(trackEl, litEl, cometG, headEl);
+
+    const readout = document.createElement("div");
+    readout.className = "comet-dial__readout";
+    readout.setAttribute("aria-hidden", "true");
+    const valueWrap = document.createElement("span");
+    valueWrap.className = "comet-dial__value";
+    const figure = document.createElement("span");
+    figure.className = "comet-dial__figure";
+    valueWrap.appendChild(figure);
+    if (unit) {
+        const u = document.createElement("span");
+        u.className = "comet-dial__unit";
+        u.textContent = unit;
+        valueWrap.appendChild(u);
+    }
+    readout.appendChild(valueWrap);
+    root.append(svg, readout);
+
+    /* --- логика --- */
+    const commit = (v, finished, detail) => {
+        const s = snap(v);
+        if (s !== target) {
+            target = s;
+            if (o.onChange) o.onChange(s);
+        }
+        if (finished && o.onChangeEnd) o.onChangeEnd(s, detail || { velocity: 0, bounce: tapBounce });
+    };
+
+    const wake = () => {
+        if (L.raf) return;
+        L.last = performance.now();
+        L.rPrev = null;
+        L.raf = requestAnimationFrame(tick);
+    };
+
+    const launch = (to, bounce, velocity) => {
+        const vel = velocity === undefined ? spring.v : velocity;
+        spring.active = false;
+        if (reduceMotion) {
+            spring.x = to;
+            spring.v = 0;
+            spring.to = to;
+            wake();
+            return;
+        }
+        spring.to = to;
+        spring.v = vel;
+        spring.c = crit * (1 - cdClamp(bounce, 0, 0.9));
+        spring.active = true;
+        wake();
+    };
+
+    const paint = now => {
+        const dt = cdClamp((now - L.last) / 1000, 0, 0.05);
+        L.last = now;
+
+        if (grip && grip.at != null) {
+            if (reduceMotion) spring.x = grip.at;
+            else spring.x += (grip.at - spring.x) * (1 - Math.exp(-dt / TAU_FOLLOW));
+        } else if (spring.active) {
+            const n = Math.max(1, Math.ceil(dt / (1 / 240)));
+            const h = dt / n;
+            for (let i = 0; i < n; i++) {
+                const a = spring.k * (spring.to - spring.x) - spring.c * spring.v;
+                spring.v += a * h;
+                spring.x += spring.v * h;
+            }
+            if (Math.abs(spring.to - spring.x) < range * 1e-4 && Math.abs(spring.v) < range * 1e-3) {
+                spring.x = spring.to;
+                spring.v = 0;
+                spring.active = false;
+            }
+        }
+
+        const r = spring.x;
+        const vRaw = L.rPrev == null || dt === 0 || reduceMotion ? 0 : (r - L.rPrev) / dt / range;
+        L.rPrev = r;
+        L.v += (vRaw - L.v) * (1 - Math.exp(-dt / TAU_V));
+        const v = L.v;
+        const s = cdClamp(Math.abs(v) / V_FULL, 0, 1);
+        const dir = Math.sign(v) || 1;
+        const f = cdClamp((r - min) / range, 0, 1);
+        const ang = start + f * sweep;
+
+        litEl.setAttribute("d", f > 0.0005 ? cdArcPath(start, ang) : "");
+        const hp = cdPointAt(ang);
+        headEl.setAttribute("cx", hp[0].toFixed(3));
+        headEl.setAttribute("cy", hp[1].toFixed(3));
+
+        const seg = (cometReach * s) / K;
+        for (let j = 0; j < K; j++) {
+            const el = comet[j];
+            let a0 = dir > 0 ? ang - (j + 1) * seg : ang + j * seg;
+            let a1 = dir > 0 ? ang - j * seg : ang + (j + 1) * seg;
+            a0 = cdClamp(a0, start, end);
+            a1 = cdClamp(a1, start, end);
+            if (seg < 0.01 || a1 - a0 < 0.01) {
+                if (el.style.opacity !== "0") el.style.opacity = "0";
+                continue;
+            }
+            const w = 1 - j / K;
+            el.setAttribute("d", cdArcPath(a0, a1));
+            el.setAttribute("stroke-width", (thickness + cometWidth * w * s).toFixed(2));
+            el.style.opacity = (w * s).toFixed(3);
+        }
+
+        const clamped = cdClamp(r, min, max);
+        const shown = o.format ? o.format(clamped) : clamped.toFixed(decimals);
+        if (shown !== L.text) {
+            L.text = shown;
+            figure.textContent = shown;
+        }
+        const num = clamped.toFixed(decimals);
+        if (num !== L.num) {
+            L.num = num;
+            svg.setAttribute("aria-valuenow", num);
+        }
+        const vt = o.valueText ? o.valueText(target) : target + unit;
+        if (vt !== L.valueText) {
+            L.valueText = vt;
+            svg.setAttribute("aria-valuetext", vt);
+        }
+
+        const moving = !!grip || spring.active || Math.abs(v) > 0.002;
+        if (!moving) {
+            comet.forEach(el => { if (el.style.opacity !== "0") el.style.opacity = "0"; });
+        }
+        L.raf = moving ? requestAnimationFrame(tick) : 0;
+    };
+
+    const tick = now => paint(now);
+
+    const localPoint = (cx, cy) => {
+        const b = svg.getBoundingClientRect();
+        return [((cx - b.left) / b.width) * 200 - 100, ((cy - b.top) / b.height) * 200 - 100];
+    };
+
+    const angleAt = (cx, cy) => {
+        const p = localPoint(cx, cy);
+        let rel = ((Math.atan2(p[1], p[0]) * 180) / Math.PI - start + 720) % 360;
+        const g = grip;
+        if (rel > sweep) rel = g && g.side ? (g.side === "hi" ? sweep : 0) : rel < sweep + gap / 2 ? sweep : 0;
+        else if (g) g.side = rel > sweep / 2 ? "hi" : "lo";
+        return min + (rel / sweep) * range;
+    };
+
+    const onMove = e => {
+        const g = grip;
+        if (!g || g.id !== e.pointerId || !e.isTrusted) return;
+        if (!g.moved) {
+            if (Math.hypot(e.clientX - g.x0, e.clientY - g.y0) < DRAG_PX) return;
+            g.moved = true;
+            spring.active = false;
+        }
+        g.at = angleAt(e.clientX, e.clientY);
+        g.hist.push([performance.now(), g.at]);
+        if (g.hist.length > 4) g.hist.shift();
+        commit(g.at, false);
+        wake();
+    };
+
+    const onUp = e => {
+        const g = grip;
+        if (!g || g.id !== e.pointerId || !e.isTrusted) return;
+        grip = null;
+        if (unbind) unbind();
+        unbind = null;
+        try { svg.releasePointerCapture(e.pointerId); } catch (err) {}
+        if (!g.moved) {
+            commit(target, true);
+            return;
+        }
+        const stale = performance.now() - g.hist[g.hist.length - 1][0] > STALE_MS;
+        const v = e.type === "pointercancel" || stale ? 0 : cdVelocityOf(g.hist);
+        const bounce = tapBounce + (flickBounce - tapBounce) * cdClamp(Math.abs(v) / range / V_FLICK, 0, 1);
+        const to = snap((g.at != null ? g.at : target) + (v / 1000) * (DECEL / (1 - DECEL)) * momentum);
+        commit(to, true, { velocity: v, bounce });
+        launch(to, bounce, v);
+    };
+
+    svg.addEventListener("pointerdown", e => {
+        if (o.disabled || grip || e.button > 0) return;
+        const p = localPoint(e.clientX, e.clientY);
+        if (Math.hypot(p[0], p[1]) < DEAD) return;
+        e.preventDefault();
+        try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+        svg.focus({ preventScroll: true });
+        grip = { id: e.pointerId, at: null, hist: [], side: null, moved: false, x0: e.clientX, y0: e.clientY };
+        const at = angleAt(e.clientX, e.clientY);
+        grip.hist.push([performance.now(), at]);
+        commit(at, false);
+        launch(snap(at), tapBounce);
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onUp);
+        unbind = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            window.removeEventListener("pointercancel", onUp);
+        };
+    });
+
+    svg.addEventListener("keydown", e => {
+        if (o.disabled) return;
+        const t = target;
+        const big = e.shiftKey ? 10 : 1;
+        let to;
+        switch (e.key) {
+            case "ArrowRight":
+            case "ArrowUp": to = t + step * big; break;
+            case "ArrowLeft":
+            case "ArrowDown": to = t - step * big; break;
+            case "PageUp": to = t + step * 10; break;
+            case "PageDown": to = t - step * 10; break;
+            case "Home": to = min; break;
+            case "End": to = max; break;
+            default: return;
+        }
+        e.preventDefault();
+        to = snap(to);
+        spring.active = false;
+        spring.x = to;
+        spring.v = 0;
+        spring.to = to;
+        commit(to, true);
+        wake();
+    });
+
+    paint(performance.now());
+
+    return {
+        el: root,
+        destroy() {
+            cancelAnimationFrame(L.raf);
+            L.raf = 0;
+            if (unbind) unbind();
+            unbind = null;
+        }
+    };
+}
+
+function buildEffortMenu() {
+    menuEl.dataset.kind = "effort";
+    menuEl.setAttribute("role", "dialog");
+    menuEl.setAttribute("aria-label", "Усилие");
+
+    const head = llEl("div", "prompt-bar__effort-head");
+    head.appendChild(llEl("span", "prompt-bar__effort-title", "Усилие"));
+    effortLevelEl = llEl("span", "prompt-bar__effort-level", EFFORTS[effortIndex].label);
+    head.appendChild(effortLevelEl);
+    const help = llEl("span", "prompt-bar__effort-help");
+    help.title = "Чем выше усилие, тем глубже и тщательнее ИИ продумывает ответ";
+    help.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5"></path><path d="M12 16.5h.01"></path></svg>';
+    head.appendChild(help);
+
+    const last = EFFORTS.length - 1;
+    effortDial = createCometDial({
+        value: effortIndex,
+        min: 0,
+        max: last,
+        step: 1,
+        label: "Усилие",
+        accent: "#45d66b",
+        ink: "#ffffff",
+        size: 176,
+        sweep: 320,
+        thickness: 5.5,
+        speed: 25,
+        tapBounce: 0.2,
+        flickBounce: 0.1,
+        momentum: 1,
+        cometReach: 180,
+        cometWidth: 12,
+        format: r => EFFORTS[cdClamp(Math.round(r), 0, last)].label,
+        valueText: v => EFFORTS[cdClamp(Math.round(v), 0, last)].label,
+        onChange: setEffort
+    });
+    effortDial.el.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            effortOpen = false;
+            syncMenu();
+            input.focus({ preventScroll: true });
+        }
+    });
+
+    const dialWrap = llEl("div", "prompt-bar__effort-dial");
+    dialWrap.appendChild(effortDial.el);
+
+    const ends = llEl("div", "prompt-bar__effort-ends");
+    ends.append(llEl("span", null, "Быстрее"), llEl("span", null, "Умнее"));
+
+    menuEl.append(head, dialWrap, ends);
+    updateEffortUI();
+}
+
+/* ----- меню команд "/" ----- */
+function parseToken(draft) {
+    const m = /(^|\s)\/([\p{L}\d_-]*)$/u.exec(draft);
+    if (!m) return null;
+    return { query: m[2].toLowerCase(), start: m.index + m[1].length };
+}
+
+function computeOpen() {
+    const token = dismissed ? null : parseToken(input.value);
+    const open = token ? "slash" : (effortOpen ? "effort" : null);
+    return { open, token };
+}
+
+function updateActive(fresh) {
+    const cursor = Math.min(active, Math.max(0, slashList.length - 1));
+    rowEls.forEach((row, i) => row.setAttribute("aria-selected", i === cursor ? "true" : "false"));
+    if (!glowEl) return;
+    const row = rowEls[cursor];
+    if (!row) {
+        glowEl.style.opacity = "0";
+        return;
+    }
+    if (fresh) glowEl.style.transition = "none";
+    glowEl.style.top = row.offsetTop + "px";
+    glowEl.style.height = row.offsetHeight + "px";
+    glowEl.style.opacity = "1";
+    if (fresh) {
+        void glowEl.offsetHeight;
+        glowEl.style.transition = "";
+    }
+}
+
+function renderSlashRows(token) {
+    menuQuery = token.query;
+    slashList = COMMANDS.filter(c => c.name.slice(1).toLowerCase().startsWith(token.query));
+    menuEl.replaceChildren();
+    glowEl = llEl("span", "prompt-bar__glow");
+    glowEl.setAttribute("aria-hidden", "true");
+    menuEl.appendChild(glowEl);
+    rowEls = [];
+
+    slashList.forEach((row, i) => {
+        const b = llEl("button", "prompt-bar__row");
+        b.type = "button";
+        b.setAttribute("role", "option");
+        b.append(
+            llEl("span", "prompt-bar__row-name", row.name),
+            llEl("span", "prompt-bar__row-desc", row.description)
+        );
+        b.addEventListener("mousedown", e => e.preventDefault());
+        b.addEventListener("pointerenter", () => { active = i; updateActive(false); });
+        b.addEventListener("click", () => pickCommand(row));
+        menuEl.appendChild(b);
+        rowEls.push(b);
+    });
+
+    if (!slashList.length) {
+        menuEl.appendChild(llEl("div", "prompt-bar__empty", "Нет совпадений для «" + token.query + "»"));
+    }
+    updateActive(true);
+}
+
+function removeMenu() {
+    if (menuEl) menuEl.remove();
+    menuEl = null;
+    menuKind = null;
+    menuQuery = null;
+    glowEl = null;
+    rowEls = [];
+    slashList = [];
+    if (effortDial) effortDial.destroy();
+    effortDial = null;
+    effortLevelEl = null;
+}
+
+function buildMenu(kind) {
+    menuEl = llEl("div", "prompt-bar__menu");
+    menuKind = kind;
+    pbRoot.insertBefore(menuEl, pbField);
+    if (kind === "effort") {
+        buildEffortMenu();
+    } else {
+        menuEl.dataset.kind = "slash";
+        menuEl.setAttribute("role", "listbox");
+        menuEl.setAttribute("aria-label", "Команды");
+    }
+    pbEffort.setAttribute("aria-expanded", kind === "effort" ? "true" : "false");
+    pbEffort.toggleAttribute("data-on", kind === "effort");
+}
+
+function syncMenu() {
+    const { open, token } = computeOpen();
+    if (open !== menuKind) {
+        removeMenu();
+        if (open) buildMenu(open);
+        else {
+            pbEffort.setAttribute("aria-expanded", "false");
+            pbEffort.removeAttribute("data-on");
+        }
+    }
+    if (open === "slash") {
+        if (menuQuery !== token.query) renderSlashRows(token);
+        else updateActive(false);
+    }
+}
+
+function closeMenus() {
+    effortOpen = false;
+    syncMenu();
+}
+
+function pickCommand(row) {
+    const token = parseToken(input.value);
+    const head = token ? input.value.slice(0, token.start) : input.value;
+    input.value = head + row.name + " ";
+    dismissed = false;
+    autoGrow();
+    updateSend();
+    syncMenu();
+    input.focus({ preventScroll: true });
+}
+
+/* ----- события ----- */
+input.addEventListener("input", () => {
+    autoGrow();
+    updateSend();
+    typing.energy = Math.min(1.6, typing.energy + 0.22);
+    typing.strokes = Math.min(4, typing.strokes + 1);
+    dismissed = false;
+    effortOpen = false;
+    active = 0;
+    syncMenu();
+});
+
+input.addEventListener("keydown", e => {
+    const { open } = computeOpen();
+
+    if (open === "slash" && slashList.length) {
+        const cursor = Math.min(active, slashList.length - 1);
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault();
+            active = (cursor + (e.key === "ArrowDown" ? 1 : slashList.length - 1)) % slashList.length;
+            updateActive(false);
+            return;
+        }
+        if ((e.key === "Enter" && !e.shiftKey) || e.key === "Tab") {
+            e.preventDefault();
+            pickCommand(slashList[cursor]);
+            return;
+        }
+    }
+
+    if (e.key === "Escape") {
+        if (open) {
+            e.preventDefault();
+            dismissed = true;
+            effortOpen = false;
+            syncMenu();
+        }
+        return;
+    }
+
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        submitMessage();
+    }
+});
+
+pbField.addEventListener("pointerdown", e => {
+    if (e.target === pbField || e.target === input) closeMenus();
+});
+pbField.addEventListener("click", () => input.focus({ preventScroll: true }));
+
+document.addEventListener("pointerdown", e => {
+    if (effortOpen && !pbRoot.contains(e.target)) closeMenus();
+});
+
+pbEffort.addEventListener("mousedown", e => e.preventDefault());
+pbEffort.addEventListener("click", () => {
+    effortOpen = !effortOpen;
+    syncMenu();
+    input.focus({ preventScroll: true });
+});
+
+send.addEventListener("mousedown", e => e.preventDefault());
+send.addEventListener("pointerdown", e => {
+    if (e.button === 0 && !send.disabled) send.setAttribute("data-pressed", "");
+});
+["pointerup", "pointercancel", "pointerleave"].forEach(ev =>
+    send.addEventListener(ev, () => send.removeAttribute("data-pressed")));
+
+send.addEventListener("click", () => {
+    if (busy) controller?.abort();
+    else submitMessage();
+});
+
+autoGrow();
+updateSend();
+updateEffortUI();
+
+/* ----- отправка ----- */
+async function submitMessage() {
+    const text = input.value.trim();
+    if (!text || busy) return;
+
+    if (WORKER_URL.includes("ВСТАВЬ")) {
+        addMessage("assistant", "Сначала укажи адрес Worker в константе WORKER_URL.");
+        return;
+    }
+
+    addMessage("user", text);
+    history.push({ role: "user", content: expandCommand(text) });
+
+    input.value = "";
+    dismissed = false;
+    autoGrow();
+    closeMenus();
+    setBusy(true);
+
+    const answerEl = addMessage("assistant", "");
+    answerEl.classList.add("loading");
+    const loader = createLatticeLoader({
+        label: "Думаю",
+        pattern: "orbit",
+        grid: 3,
+        shape: "round",
+        cellSize: 6,
+        gap: 2,
+        fontSize: 14,
+        glow: true,
+        color: "#45d66b"
+    });
+    const answerBody = document.createElement("div");
+    answerEl.append(loader.el, answerBody);
+    main.scrollTop = main.scrollHeight;
+
+    controller = new AbortController();
+
+    try {
+        const response = await fetch(
+            WORKER_URL,
+            {
+                method: "POST",
+                signal: controller.signal,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    messages: [
+                        { role: "system", content: buildSystemPrompt() },
+                        ...history
+                    ]
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error?.message || response.status);
+        }
+
+        const answer = data.choices?.[0]?.message?.content;
+
+        if (typeof answer !== "string") {
+            throw new Error("Пустой ответ модели");
+        }
+
+        history.push({ role: "assistant", content: answer });
+
+        // Ответ готов: анимация загрузки полностью убирается
+        loader.destroy();
+        loader.el.remove();
+        answerEl.classList.remove("loading");
+        renderAnswer(answerBody, answer);
+
+    } catch (error) {
+        loader.destroy();
+        loader.el.remove();
+        answerEl.classList.remove("loading");
+        history.pop();
+
+        if (error.name === "AbortError") {
+            answerBody.textContent = "Генерация остановлена.";
+        } else {
+            answerBody.textContent = "Ошибка: " + error.message;
+        }
+    } finally {
+        controller = null;
+        setBusy(false);
+        input.focus();
+    }
+}
+
+/* ===== HoldButton (React Bits), порт на чистый JS ===== */
+let hbSeq = 0;
+
+function createHoldButton(options) {
+    const o = Object.assign({
+        children: "Hold", doneLabel: "Done", icon: "", doneIcon: "",
+        backgroundColor: "#27272a", fillColor: "#5227FF", textColor: "#f5f5f5", fillTextColor: "#ffffff",
+        size: "md", radius: 14, fillDirection: "right", holdTime: 2000, releaseTime: 200,
+        pressScale: 0.97, wave: true, waveAmplitude: 6, glow: true, resetAfter: 1200,
+        disabled: false, title: "", onHold: null, onTap: null
+    }, options);
+
+    const TAP_MS = 250, HIT_PAD = 10;
+    const LINEAR = t => t;
+    const EASE_OUT = t => 1 - Math.pow(1 - t, 3);
+
+    let phase = "idle";
+    let inputKind = null;
+    const gesture = { pointerId: null, start: 0, rect: null };
+    const timers = { complete: 0, reset: 0 };
+    const motion = { raf: 0, p: 0, from: 0, to: 0, start: 0 };
+    const hintId = "hb-hint-" + (++hbSeq);
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.disabled = o.disabled;
+    btn.className = "hold-button hold-button--" + o.size;
+    btn.dataset.phase = "idle";
+    btn.dataset.direction = o.fillDirection === "up" ? "up" : "right";
+    if (o.glow) btn.dataset.glow = "true";
+    btn.setAttribute("aria-describedby", hintId);
+    if (o.title) btn.title = o.title;
+
+    const vars = {
+        "--hb-radius": o.radius + "px",
+        "--hb-bg": o.backgroundColor,
+        "--hb-fill": o.fillColor,
+        "--hb-text": o.textColor,
+        "--hb-fill-text": o.fillTextColor,
+        "--hb-hold": o.holdTime + "ms",
+        "--hb-cycles": o.holdTime / 1100,
+        "--hb-release": o.releaseTime + "ms",
+        "--hb-press": o.pressScale,
+        "--hb-wave": (o.wave ? o.waveAmplitude : 0) + "px"
+    };
+    for (const k in vars) btn.style.setProperty(k, vars[k]);
+
+    const idleEls = [], doneEls = [];
+    const makeLabels = cls => {
+        const wrap = llEl("span", cls);
+        const idle = llEl("span", "hold-button__idle");
+        if (o.icon) {
+            const ic = llEl("span", "hold-button__icon");
+            ic.innerHTML = o.icon;
+            idle.appendChild(ic);
+        }
+        idle.appendChild(document.createTextNode(o.children));
+        const done = llEl("span", "hold-button__done");
+        if (o.doneIcon) {
+            const ic = llEl("span", "hold-button__icon");
+            ic.innerHTML = o.doneIcon;
+            done.appendChild(ic);
+        }
+        done.appendChild(document.createTextNode(o.doneLabel));
+        idle.setAttribute("aria-hidden", "false");
+        done.setAttribute("aria-hidden", "true");
+        wrap.append(idle, done);
+        idleEls.push(idle);
+        doneEls.push(done);
+        return wrap;
+    };
+
+    const pulse = llEl("span", "hold-button__pulse");
+    pulse.setAttribute("aria-hidden", "true");
+    const label = makeLabels("hold-button__label");
+    const clip = llEl("span", "hold-button__clip");
+    clip.setAttribute("aria-hidden", "true");
+    const fill = llEl("span", "hold-button__fill");
+    fill.appendChild(makeLabels("hold-button__label hold-button__label--fill"));
+    const crest = llEl("span", "hold-button__crest");
+    crest.setAttribute("aria-hidden", "true");
+    crest.appendChild(makeLabels("hold-button__label hold-button__label--fill"));
+    clip.append(fill, crest);
+    const sr = llEl("span", "hold-button__sr",
+        "Удерживай " + (Math.round(o.holdTime / 100) / 10) + " сек., чтобы подтвердить");
+    sr.id = hintId;
+    btn.append(pulse, label, clip, sr);
+
+    let globalOn = false;
+    const cancelHold = () => release({ drifted: true });
+    const onVisibility = () => { if (document.hidden) cancelHold(); };
+    const addGlobal = () => {
+        if (globalOn) return;
+        globalOn = true;
+        window.addEventListener("blur", cancelHold);
+        document.addEventListener("visibilitychange", onVisibility);
+    };
+    const removeGlobal = () => {
+        if (!globalOn) return;
+        globalOn = false;
+        window.removeEventListener("blur", cancelHold);
+        document.removeEventListener("visibilitychange", onVisibility);
+    };
+
+    const go = (next, kind = null) => {
+        phase = next;
+        inputKind = kind;
+        btn.dataset.phase = next;
+        if (kind) btn.dataset.input = kind;
+        else btn.removeAttribute("data-input");
+        idleEls.forEach(e => e.setAttribute("aria-hidden", String(next === "done")));
+        doneEls.forEach(e => e.setAttribute("aria-hidden", String(next !== "done")));
+        if (next === "holding") addGlobal();
+        else removeGlobal();
+    };
+
+    const clearTimers = () => {
+        clearTimeout(timers.complete);
+        clearTimeout(timers.reset);
+    };
+
+    const drive = (to, duration, ease) => {
+        cancelAnimationFrame(motion.raf);
+        motion.from = motion.p;
+        motion.to = to;
+        motion.start = performance.now();
+        const step = now => {
+            const t = duration > 0 ? Math.min(1, (now - motion.start) / duration) : 1;
+            motion.p = motion.from + (motion.to - motion.from) * ease(t);
+            btn.style.setProperty("--hb-p", motion.p.toFixed(4));
+            if (t < 1) {
+                motion.raf = requestAnimationFrame(step);
+                return;
+            }
+            motion.raf = 0;
+            if (motion.to === 1) complete();
+        };
+        motion.raf = requestAnimationFrame(step);
+    };
+
+    function complete() {
+        if (phase !== "holding") return;
+        if (performance.now() - gesture.start < o.holdTime - 50) return;
+        clearTimers();
+        go("done", inputKind);
+        if (o.onHold) o.onHold();
+        if (o.resetAfter > 0) {
+            timers.reset = setTimeout(() => {
+                go("idle");
+                drive(0, o.releaseTime, EASE_OUT);
+            }, o.resetAfter);
+        }
+    }
+
+    const begin = kind => {
+        if (o.disabled || phase !== "idle") return false;
+        gesture.start = performance.now();
+        gesture.rect = btn.getBoundingClientRect();
+        go("holding", kind);
+        drive(1, o.holdTime, LINEAR);
+        timers.complete = setTimeout(complete, o.holdTime + 100);
+        return true;
+    };
+
+    function release(opts) {
+        const drifted = !!(opts && opts.drifted);
+        if (phase !== "holding") return;
+        clearTimers();
+        const held = performance.now() - gesture.start;
+        go("idle");
+        drive(0, o.releaseTime, EASE_OUT);
+        if (!drifted && held < TAP_MS && o.onTap) o.onTap();
+    }
+
+    const endPointer = (e, opts) => {
+        if (e.pointerId !== gesture.pointerId) return;
+        gesture.pointerId = null;
+        try {
+            if (btn.hasPointerCapture(e.pointerId)) btn.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+        release(opts);
+    };
+
+    btn.addEventListener("pointerdown", e => {
+        if (e.button !== 0 || !e.isPrimary || gesture.pointerId !== null) return;
+        if (!begin("pointer")) return;
+        gesture.pointerId = e.pointerId;
+        try { btn.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    btn.addEventListener("pointermove", e => {
+        if (e.pointerId !== gesture.pointerId) return;
+        const r = gesture.rect;
+        if (!r) return;
+        const out = e.clientX < r.left - HIT_PAD || e.clientX > r.right + HIT_PAD ||
+            e.clientY < r.top - HIT_PAD || e.clientY > r.bottom + HIT_PAD;
+        if (out) endPointer(e, { drifted: true });
+    });
+
+    btn.addEventListener("pointerup", e => endPointer(e));
+    btn.addEventListener("pointercancel", e => endPointer(e, { drifted: true }));
+    btn.addEventListener("lostpointercapture", e => endPointer(e, { drifted: true }));
+    btn.addEventListener("pointerleave", e => {
+        if (e.pointerType !== "touch") endPointer(e, { drifted: true });
+    });
+
+    btn.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+            if (inputKind === "key") release({ drifted: true });
+            return;
+        }
+        if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            if (!e.repeat) begin("key");
+        }
+    });
+
+    btn.addEventListener("keyup", e => {
+        if (e.key === " " || e.key === "Enter") {
+            e.preventDefault();
+            if (inputKind === "key") release();
+        }
+    });
+
+    btn.addEventListener("contextmenu", e => e.preventDefault());
+
+    const measure = () => {
+        btn.style.setProperty("--hb-w", btn.offsetWidth + "px");
+        btn.style.setProperty("--hb-h", btn.offsetHeight + "px");
+    };
+    new ResizeObserver(measure).observe(btn);
+
+    return { el: btn };
+}
+
+/* ----- новый чат ----- */
+function newChat() {
+    if (controller) controller.abort();
+    history.length = 0;
+    messages.innerHTML = welcomeHTML;
+    input.value = "";
+    autoGrow();
+    updateSend();
+    closeMenus();
+    main.scrollTop = 0;
+    input.focus({ preventScroll: true });
+}
+
+document.getElementById("newChatHost").appendChild(createHoldButton({
+    children: "Новый чат",
+    doneLabel: "Готово",
+    icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>',
+    doneIcon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>',
+    backgroundColor: "rgba(255, 255, 255, .08)",
+    fillColor: "#45d66b",
+    textColor: "#f5f5f5",
+    fillTextColor: "#06240f",
+    size: "sm",
+    radius: 12,
+    fillDirection: "right",
+    holdTime: 1000,
+    releaseTime: 200,
+    pressScale: 0.97,
+    wave: true,
+    waveAmplitude: 6,
+    glow: true,
+    resetAfter: 900,
+    title: "Удерживай, чтобы начать новый чат",
+    onHold: newChat
+}).el);
+</script>
+
+<!-- ============ PatternWaves (React Bits), порт на чистый JS ============ -->
+<script type="module">
+import { Renderer, Program, Mesh, Triangle, RenderTarget, Texture }
+    from "https://cdn.jsdelivr.net/npm/ogl@1.0.11/src/index.js";
+
+/* ---------- Настройки фона (меняй тут) ---------- */
+const SETTINGS = {
+    preset: 'silk',            // silk | ocean | pond | lines | terminal | mesh
+    color: '#45d66b',
+    backgroundColor: '#090b09',
+    opacity: 0.55,
+    fade: 'center',            // edges | center | bottom | top | none
+    fadeSize: 0.5,
+    interactive: true,
+    cursorSize: 50,
+    cursorStrength: 0.6,
+    intro: true,
+    paused: false,
+    characters: '.:-=+*#%@'
+    // Можно переопределить: pattern, wave, spacing, markSize, depth,
+    // light, shine, contrast, speed, scale, direction
+};
+
+const SURFACE_PRESETS = {
+  silk: { pattern: 'dot', wave: 'silk', spacing: 9, markSize: 0.95, depth: 0.95, light: 0, shine: 0.8, contrast: 1.2, speed: 0.35, scale: 1, direction: 20 },
+  ocean: { pattern: 'dot', wave: 'swell', spacing: 10, markSize: 0.9, depth: 0.42, light: 0, shine: 1, contrast: 1.2, speed: 0.5, scale: 1, direction: 100 },
+  pond: { pattern: 'dot', wave: 'ripple', spacing: 10, markSize: 0.9, depth: 0.55, light: 0, shine: 1.2, contrast: 1.2, speed: 0.5, scale: 1, direction: 35 },
+  lines: { pattern: 'line', wave: 'silk', spacing: 12, markSize: 0.42, depth: 0.9, light: 0, shine: 0.6, contrast: 1.2, speed: 0.3, scale: 1, direction: 20 },
+  terminal: { pattern: 'glyph', wave: 'ripple', spacing: 13, markSize: 0.95, depth: 0.75, light: 0, shine: 0.9, contrast: 1.4, speed: 0.3, scale: 1.1, direction: 200 },
+  mesh: { pattern: 'plus', wave: 'silk', spacing: 14, markSize: 0.8, depth: 0.95, light: 0, shine: 1, contrast: 1.45, speed: 0.4, scale: 1.1, direction: 325 }
+};
+
+const PATTERNS = { dot: 0, square: 1, plus: 2, line: 3, glyph: 4 };
+const WAVES = { silk: 0, swell: 1, ripple: 2 };
+const FADES = { none: 0, edges: 1, center: 2, bottom: 3, top: 4 };
+const GLYPH_FONT = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+const ATLAS_TILE = 128;
+const WAVE_UNIT = 520;
+const RIPPLE_CELL = 8;
+const RIPPLE_RATE = 60;
+const PIXEL_BUDGET = 4.5e6;
+const INTRO_SECONDS = 2;
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const luminance = rgba => 0.2126 * rgba[0] + 0.7152 * rgba[1] + 0.0722 * rgba[2];
+
+const parseColor = (value, fallback) => {
+  try {
+    const ctx = document.createElement('canvas').getContext('2d');
+    if (!ctx) return fallback;
+    ctx.fillStyle = '#000000';
+    ctx.fillStyle = value;
+    const resolved = ctx.fillStyle;
+    if (resolved.startsWith('#')) {
+      const n = parseInt(resolved.slice(1), 16);
+      return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255, 1];
+    }
+    const parts = resolved.match(/[\d.]+/g);
+    if (!parts || parts.length < 3) return fallback;
+    return [Number(parts[0]) / 255, Number(parts[1]) / 255, Number(parts[2]) / 255, parts[3] ? Number(parts[3]) : 1];
+  } catch {
+    return fallback;
+  }
+};
+
+const buildAtlas = characters => {
+  const glyphs = Array.from(characters && characters.length ? characters : '.:-=+*#%@');
+  const columns = Math.ceil(Math.sqrt(glyphs.length));
+  const lines = Math.ceil(glyphs.length / columns);
+  const canvas = document.createElement('canvas');
+  canvas.width = columns * ATLAS_TILE;
+  canvas.height = lines * ATLAS_TILE;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `500 ${Math.round(ATLAS_TILE * 0.86)}px ${GLYPH_FONT}`;
+  glyphs.forEach((glyph, index) => {
+    const x = (index % columns) * ATLAS_TILE + ATLAS_TILE / 2;
+    const y = Math.floor(index / columns) * ATLAS_TILE + ATLAS_TILE / 2;
+    ctx.fillText(glyph, x, y);
+  });
+  return { canvas, columns, lines, count: glyphs.length };
+};
+
+const passVertex = `#version 300 es
+in vec2 position;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+}
+`;
+
+const fieldFragment = `#version 300 es
+precision highp float;
+precision highp int;
+uniform vec2 uSize;
+uniform float uDpr;
+uniform vec2 uOrigin;
+uniform vec2 uPitch;
+uniform int uWave;
+uniform float uTime;
+uniform float uUnit;
+uniform vec2 uHeading;
+uniform float uAmp;
+uniform float uDepth;
+uniform vec3 uLight;
+uniform float uShine;
+uniform float uContrast;
+uniform float uInk;
+uniform float uOpacity;
+uniform int uFade;
+uniform float uFadeSize;
+uniform float uAppear;
+uniform sampler2D tRipple;
+uniform float uRipple;
+out vec4 fragColor;
+
+const float FOLDS = 5.5;
+
+uvec3 scramble(uvec3 v) {
+  v = v * 1664525u + 1013904223u;
+  v.x += v.y * v.z;
+  v.y += v.z * v.x;
+  v.z += v.x * v.y;
+  v ^= v >> 16u;
+  v.x += v.y * v.z;
+  v.y += v.z * v.x;
+  v.z += v.x * v.y;
+  return v;
+}
+
+vec3 lattice(vec3 corner) {
+  uvec3 h = scramble(uvec3(ivec3(corner) + 4096));
+  return vec3(h & 65535u) / 32767.5 - 1.0;
+}
+
+float gradientNoise(vec3 p) {
+  vec3 i = floor(p);
+  vec3 f = p - i;
+  vec3 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+  float n000 = dot(lattice(i), f);
+  float n100 = dot(lattice(i + vec3(1.0, 0.0, 0.0)), f - vec3(1.0, 0.0, 0.0));
+  float n010 = dot(lattice(i + vec3(0.0, 1.0, 0.0)), f - vec3(0.0, 1.0, 0.0));
+  float n110 = dot(lattice(i + vec3(1.0, 1.0, 0.0)), f - vec3(1.0, 1.0, 0.0));
+  float n001 = dot(lattice(i + vec3(0.0, 0.0, 1.0)), f - vec3(0.0, 0.0, 1.0));
+  float n101 = dot(lattice(i + vec3(1.0, 0.0, 1.0)), f - vec3(1.0, 0.0, 1.0));
+  float n011 = dot(lattice(i + vec3(0.0, 1.0, 1.0)), f - vec3(0.0, 1.0, 1.0));
+  float n111 = dot(lattice(i + vec3(1.0, 1.0, 1.0)), f - vec3(1.0, 1.0, 1.0));
+  return mix(
+    mix(mix(n000, n100, u.x), mix(n010, n110, u.x), u.y),
+    mix(mix(n001, n101, u.x), mix(n011, n111, u.x), u.y),
+    u.z
+  );
+}
+
+vec2 turn(vec2 v, float angle) {
+  float c = cos(angle);
+  float s = sin(angle);
+  return vec2(c * v.x - s * v.y, s * v.x + c * v.y);
+}
+
+float surface(vec2 p, float t) {
+  if (uWave == 0) {
+    vec2 side = vec2(-uHeading.y, uHeading.x);
+    float u = dot(p, uHeading);
+    float v = dot(p, side);
+    float bend = gradientNoise(vec3(v * 0.85, u * 0.3, t * 0.05)) * 1.7 + 0.4 * sin(v * 1.6 + t * 0.2);
+    float phase = u * FOLDS + bend - t * 0.45;
+    float swell = 0.6 + 0.4 * gradientNoise(vec3(u * 0.55 + 3.0, v * 0.45, t * 0.04));
+    float fold = sin(phase) + 0.32 * sin(2.0 * phase + 1.3);
+    float ripple = 0.16 * sin(u * FOLDS * 2.5 + bend * 1.9 - t * 0.9 + 2.1);
+    return (fold + ripple) * swell;
+  }
+  if (uWave == 1) {
+    float bend = gradientNoise(vec3(p * 0.6, t * 0.05)) * 0.6;
+    float phase = dot(p, uHeading) * 15.0 + bend * 2.2 - t * 1.4;
+    float swell = sin(phase) + 0.3 * sin(2.0 * phase - 0.8);
+    float roll = 0.75 + 0.25 * gradientNoise(vec3(p * 0.9 + 11.0, t * 0.05));
+    return 0.8 * swell * roll;
+  }
+  float r = length(p + uHeading * 1.2);
+  float bend = gradientNoise(vec3(p * 1.2, t * 0.05)) * 0.1;
+  return sin((r + bend) * 9.0 - t * 1.8) * (0.45 + 0.55 * exp(-(r - 0.6) * 0.8));
+}
+
+float heightAt(vec2 css) {
+  float h = surface((css - 0.5 * uSize) / uUnit, uTime) * uAmp;
+  if (uRipple > 0.0) h += texture(tRipple, css / uSize).r * uRipple;
+  return h;
+}
+
+void main() {
+  vec2 cell = floor(gl_FragCoord.xy);
+  vec2 center = uOrigin + (cell + 0.5) * uPitch;
+  vec2 css = center / uDpr;
+  vec2 uv = css / uSize;
+  float e = max(uPitch.y / uDpr, 4.0);
+  float h = heightAt(css);
+  float hx = (heightAt(css + vec2(e, 0.0)) - heightAt(css - vec2(e, 0.0))) / (2.0 * e);
+  float hy = (heightAt(css + vec2(0.0, e)) - heightAt(css - vec2(0.0, e))) / (2.0 * e);
+  vec2 grad = vec2(hx, hy) * uUnit * uDepth * 0.4;
+  vec3 n = normalize(vec3(-grad, 1.0));
+
+  float diffuse = clamp(dot(n, uLight), 0.0, 1.0);
+  vec3 halfway = normalize(uLight + vec3(0.0, 0.0, 1.0));
+  float spec = pow(clamp(dot(n, halfway), 0.0, 1.0), 160.0) * uShine * 1.15;
+  float hollow = 0.7 + 0.3 * clamp(h * 0.5 + 0.5, 0.0, 1.0);
+  float tone = clamp(diffuse * hollow * 0.78 + spec, 0.0, 1.0);
+  tone = clamp((tone - 0.42) * uContrast + 0.42, 0.0, 1.0);
+
+  float level = uInk > 0.5 ? pow(clamp(1.0 - tone / 0.46, 0.0, 1.0), 2.4) * 0.72 : pow(tone, 2.2);
+  float emphasis = uInk > 0.5 ? smoothstep(0.55, 0.95, level) : clamp(spec * 1.6, 0.0, 1.0);
+
+  float fade = 1.0;
+  vec2 c = uv * 2.0 - 1.0;
+  if (uFade == 1) {
+    fade = 1.0 - smoothstep(1.0 - uFadeSize, 1.18, length(c));
+  } else if (uFade == 2) {
+    fade = mix(0.05, 1.0, smoothstep(0.08, 0.08 + uFadeSize, length(c * vec2(1.0, 1.35))));
+  } else if (uFade == 3) {
+    fade = smoothstep(0.0, uFadeSize, uv.y);
+  } else if (uFade == 4) {
+    fade = smoothstep(0.0, uFadeSize, 1.0 - uv.y);
+  }
+
+  float reach = length(css - 0.5 * uSize) / max(0.5 * length(uSize), 1.0);
+  float appear = smoothstep(reach - 0.05, reach + 0.3, uAppear * 1.35);
+
+  float alpha = uOpacity * fade * appear * (0.22 + 0.78 * level);
+  float lift = clamp(h * uDepth * 0.42, -0.48, 0.48);
+  fragColor = vec4(level, alpha, emphasis, lift + 0.5);
+}
+`;
+
+const rippleFragment = `#version 300 es
+precision highp float;
+uniform sampler2D tState;
+uniform vec2 uTexel;
+uniform vec2 uSize;
+uniform vec2 uFrom;
+uniform vec2 uTo;
+uniform float uRadius;
+uniform float uImpulse;
+uniform float uDamping;
+out vec4 fragColor;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy * uTexel;
+  vec2 state = texture(tState, uv).rg;
+  float left = texture(tState, uv - vec2(uTexel.x, 0.0)).r;
+  float right = texture(tState, uv + vec2(uTexel.x, 0.0)).r;
+  float below = texture(tState, uv - vec2(0.0, uTexel.y)).r;
+  float above = texture(tState, uv + vec2(0.0, uTexel.y)).r;
+  float next = ((left + right + below + above) * 0.5 - state.g) * uDamping;
+  vec2 p = uv * uSize;
+  vec2 segment = uTo - uFrom;
+  float along = clamp(dot(p - uFrom, segment) / max(dot(segment, segment), 1e-4), 0.0, 1.0);
+  float d = length(p - uFrom - segment * along) / uRadius;
+  next -= uImpulse * exp(-d * d * 2.0);
+  fragColor = vec4(next, state.r, 0.0, 1.0);
+}
+`;
+
+const markFragment = `#version 300 es
+precision highp float;
+precision highp int;
+uniform sampler2D tField;
+uniform sampler2D tAtlas;
+uniform vec2 uOrigin;
+uniform vec2 uPitch;
+uniform vec2 uGrid;
+uniform int uPattern;
+uniform float uMarkSize;
+uniform float uStroke;
+uniform vec3 uColor;
+uniform vec3 uAccent;
+uniform vec4 uBackground;
+uniform vec3 uAtlas;
+out vec4 fragColor;
+
+float box(vec2 p, vec2 b, float r) {
+  vec2 q = abs(p) - b + r;
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+}
+
+float coverage(vec2 local, float level) {
+  float span = uPitch.y * uMarkSize;
+  float area = max(sqrt(level), 0.14);
+  if (uPattern == 0) {
+    return clamp(0.5 - (length(local) - 0.5 * span * area), 0.0, 1.0);
+  }
+  if (uPattern == 1) {
+    float extent = 0.5 * span * area;
+    return clamp(0.5 - box(local, vec2(extent), extent * 0.3), 0.0, 1.0);
+  }
+  if (uPattern == 2) {
+    float arm = 0.5 * span * mix(0.3, 1.0, level);
+    float width = 0.5 * uStroke;
+    return clamp(0.5 - min(box(local, vec2(arm, width), width), box(local, vec2(width, arm), width)), 0.0, 1.0);
+  }
+  if (uAtlas.z < 1.0) return 0.0;
+  vec2 g = local / span + 0.5;
+  if (g.x < 0.0 || g.y < 0.0 || g.x > 1.0 || g.y > 1.0) return 0.0;
+  float index = min(floor(level * uAtlas.z), uAtlas.z - 1.0);
+  vec2 tile = vec2(mod(index, uAtlas.x), floor(index / uAtlas.x));
+  vec2 atlasUv = (tile + vec2(g.x, 1.0 - g.y)) / uAtlas.xy;
+  vec2 texel = 1.0 / (span * uAtlas.xy);
+  return textureGrad(tAtlas, atlasUv, vec2(texel.x, 0.0), vec2(0.0, texel.y)).a;
+}
+
+vec4 lineInk(vec2 rel) {
+  float fx = rel.x / uPitch.x - 0.5;
+  float c0 = clamp(floor(fx), 0.0, uGrid.x - 1.0);
+  float c1 = min(c0 + 1.0, uGrid.x - 1.0);
+  float t = clamp(fx - c0, 0.0, 1.0);
+  float row = floor(rel.y / uPitch.y);
+  vec4 ink = vec4(0.0);
+  for (int k = -1; k <= 1; k++) {
+    float cy = row + float(k);
+    if (cy < 0.0 || cy >= uGrid.y) continue;
+    vec4 a = texelFetch(tField, ivec2(int(c0), int(cy)), 0);
+    vec4 b = texelFetch(tField, ivec2(int(c1), int(cy)), 0);
+    vec4 f = mix(a, b, t);
+    if (f.g < 0.002) continue;
+    float y = (cy + 0.5 + f.a - 0.5) * uPitch.y;
+    float slope = (b.a - a.a) * uPitch.y / uPitch.x;
+    float thickness = max(uStroke, uPitch.y * uMarkSize * f.r);
+    float d = abs(rel.y - y) / sqrt(1.0 + slope * slope) - 0.5 * thickness;
+    float alpha = clamp(0.5 - d, 0.0, 1.0) * f.g;
+    if (alpha > ink.a) ink = vec4(mix(uColor, uAccent, f.b) * alpha, alpha);
+  }
+  return ink;
+}
+
+void main() {
+  vec2 rel = gl_FragCoord.xy - uOrigin;
+  vec4 background = vec4(uBackground.rgb * uBackground.a, uBackground.a);
+  vec4 ink = vec4(0.0);
+  if (uPattern == 3) {
+    ink = lineInk(rel);
+  } else {
+    float cx = floor(rel.x / uPitch.x);
+    float row = floor(rel.y / uPitch.y);
+    if (cx >= 0.0 && cx < uGrid.x) {
+      for (int k = -1; k <= 1; k++) {
+        float cy = row + float(k);
+        if (cy < 0.0 || cy >= uGrid.y) continue;
+        vec4 f = texelFetch(tField, ivec2(int(cx), int(cy)), 0);
+        if (f.g < 0.002) continue;
+        vec2 center = (vec2(cx, cy) + 0.5) * uPitch + vec2(0.0, (f.a - 0.5) * uPitch.y);
+        float alpha = coverage(rel - center, f.r) * f.g;
+        if (alpha > ink.a) ink = vec4(mix(uColor, uAccent, f.b) * alpha, alpha);
+      }
+    }
+  }
+  fragColor = ink + background * (1.0 - ink.a);
+}
+`;
+
+function initPatternWaves(container, opts) {
+  const base = SURFACE_PRESETS[opts.preset] || SURFACE_PRESETS.silk;
+  const pick = key => (opts[key] === undefined || opts[key] === null ? base[key] : opts[key]);
+
+  const s = {
+    color: parseColor(opts.color, [1, 1, 1, 1]),
+    background: parseColor(opts.backgroundColor, [0, 0, 0, 1]),
+    pattern: pick('pattern'),
+    wave: pick('wave'),
+    spacing: pick('spacing'),
+    markSize: pick('markSize'),
+    depth: pick('depth'),
+    light: pick('light'),
+    shine: pick('shine'),
+    contrast: pick('contrast'),
+    speed: pick('speed'),
+    scale: pick('scale'),
+    direction: pick('direction'),
+    opacity: opts.opacity ?? 1,
+    fade: opts.fade ?? 'edges',
+    fadeSize: opts.fadeSize ?? 0.5,
+    characters: opts.characters,
+    interactive: opts.interactive ?? true,
+    cursorSize: opts.cursorSize ?? 50,
+    cursorStrength: opts.cursorStrength ?? 0.6,
+    intro: opts.intro ?? true,
+    paused: opts.paused ?? false
+  };
+
+  const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: false, depth: false });
+  const gl = renderer.gl;
+  if (!renderer.isWebgl2) {
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return;
+  }
+  gl.clearColor(0, 0, 0, 0);
+  const canvas = gl.canvas;
+  canvas.style.display = 'block';
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  canvas.setAttribute('aria-hidden', 'true');
+  container.appendChild(canvas);
+
+  const geometry = new Triangle(gl);
+  const blank = new Texture(gl);
+  const floatTargets = !!gl.getExtension('EXT_color_buffer_float');
+
+  const dispose = target => {
+    gl.deleteFramebuffer(target.buffer);
+    gl.deleteTexture(target.texture.texture);
+  };
+
+  const fieldTargetFor = (w, h) =>
+    new RenderTarget(gl, { width: w, height: h, depth: false, minFilter: gl.NEAREST, magFilter: gl.NEAREST });
+
+  const rippleTargetFor = (w, h) =>
+    new RenderTarget(gl, {
+      width: w,
+      height: h,
+      depth: false,
+      type: gl.HALF_FLOAT,
+      format: gl.RGBA,
+      internalFormat: gl.RGBA16F,
+      minFilter: gl.LINEAR,
+      magFilter: gl.LINEAR
+    });
+
+  let fieldTarget = fieldTargetFor(1, 1);
+  let ripple = null;
+
+  const atlasTexture = new Texture(gl, {
+    generateMipmaps: true,
+    minFilter: gl.LINEAR_MIPMAP_LINEAR,
+    magFilter: gl.LINEAR,
+    flipY: false
+  });
+
+  const fieldUniforms = {
+    uSize: { value: [1, 1] },
+    uDpr: { value: 1 },
+    uOrigin: { value: [0, 0] },
+    uPitch: { value: [1, 1] },
+    uWave: { value: 0 },
+    uTime: { value: 0 },
+    uUnit: { value: WAVE_UNIT },
+    uHeading: { value: [1, 0] },
+    uAmp: { value: 0 },
+    uDepth: { value: 0.5 },
+    uLight: { value: [0, 0, 1] },
+    uShine: { value: 0.8 },
+    uContrast: { value: 1 },
+    uInk: { value: 0 },
+    uOpacity: { value: 1 },
+    uFade: { value: 0 },
+    uFadeSize: { value: 0.5 },
+    uAppear: { value: 0 },
+    tRipple: { value: blank },
+    uRipple: { value: 0 }
+  };
+  const fieldMesh = new Mesh(gl, {
+    geometry,
+    program: new Program(gl, {
+      vertex: passVertex, fragment: fieldFragment, uniforms: fieldUniforms,
+      depthTest: false, depthWrite: false
+    })
+  });
+
+  const rippleUniforms = {
+    tState: { value: blank },
+    uTexel: { value: [1, 1] },
+    uSize: { value: [1, 1] },
+    uFrom: { value: [0, 0] },
+    uTo: { value: [0, 0] },
+    uRadius: { value: 40 },
+    uImpulse: { value: 0 },
+    uDamping: { value: 0.975 }
+  };
+  const rippleMesh = new Mesh(gl, {
+    geometry,
+    program: new Program(gl, {
+      vertex: passVertex, fragment: rippleFragment, uniforms: rippleUniforms,
+      depthTest: false, depthWrite: false
+    })
+  });
+
+  const markUniforms = {
+    tField: { value: fieldTarget.texture },
+    tAtlas: { value: atlasTexture },
+    uOrigin: { value: [0, 0] },
+    uPitch: { value: [1, 1] },
+    uGrid: { value: [1, 1] },
+    uPattern: { value: 0 },
+    uMarkSize: { value: 0.9 },
+    uStroke: { value: 2 },
+    uColor: { value: [1, 1, 1] },
+    uAccent: { value: [1, 1, 1] },
+    uBackground: { value: [0, 0, 0, 1] },
+    uAtlas: { value: [1, 1, 0] }
+  };
+  const markMesh = new Mesh(gl, {
+    geometry,
+    program: new Program(gl, {
+      vertex: passVertex, fragment: markFragment, uniforms: markUniforms,
+      depthTest: false, depthWrite: false
+    })
+  });
+
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+  let width = 1, height = 1;
+  let raf = 0;
+  let last = performance.now();
+  let time = 0;
+  let introClock = 0;
+  let visible = true;
+  let alive = true;
+  let dirty = true;
+  let rippleUntil = 0;
+  let rippleLive = false;
+  let rippleClock = 0;
+  let atlasKey = '';
+  const pointer = { x: 0, y: 0, inside: false, placed: false, lastX: 0, lastY: 0, burst: 0 };
+
+  const buildRipple = () => {
+    if (!floatTargets) return;
+    const w = clamp(Math.ceil(width / RIPPLE_CELL), 4, 512);
+    const h = clamp(Math.ceil(height / RIPPLE_CELL), 4, 512);
+    if (ripple && ripple.width === w && ripple.height === h) return;
+    if (ripple) {
+      dispose(ripple.read);
+      dispose(ripple.write);
+    }
+    ripple = { width: w, height: h, read: rippleTargetFor(w, h), write: rippleTargetFor(w, h) };
+    rippleLive = false;
+  };
+
+  const clearRipple = () => {
+    if (!ripple) return;
+    [ripple.read, ripple.write].forEach(target => {
+      renderer.bindFramebuffer(target);
+      gl.viewport(0, 0, target.width, target.height);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    });
+    renderer.bindFramebuffer();
+  };
+
+  const refreshAtlas = () => {
+    if (s.characters === atlasKey) return;
+    atlasKey = s.characters;
+    const built = buildAtlas(s.characters);
+    if (!built) return;
+    atlasTexture.image = built.canvas;
+    markUniforms.uAtlas.value = [built.columns, built.lines, built.count];
+  };
+
+  const resize = () => {
+    width = Math.max(1, container.clientWidth);
+    height = Math.max(1, container.clientHeight);
+    renderer.dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXEL_BUDGET / (width * height)));
+    renderer.setSize(width, height);
+    buildRipple();
+    dirty = true;
+    start();
+  };
+
+  const stepRipple = (field, dt) => {
+    rippleClock = Math.min(rippleClock + dt * RIPPLE_RATE, 4);
+    const strength = clamp(s.cursorStrength, 0, 1);
+    const moved = Math.hypot(pointer.x - pointer.lastX, pointer.y - pointer.lastY);
+    let impulse = (pointer.inside ? Math.min(moved / 14, 1) * 0.35 * strength : 0) + pointer.burst * strength;
+    pointer.burst = 0;
+    rippleUniforms.uTexel.value = [1 / field.width, 1 / field.height];
+    rippleUniforms.uSize.value = [width, height];
+    rippleUniforms.uFrom.value = [pointer.lastX, height - pointer.lastY];
+    rippleUniforms.uTo.value = [pointer.x, height - pointer.y];
+    rippleUniforms.uRadius.value = clamp(s.cursorSize, 8, 400);
+    while (rippleClock >= 1) {
+      rippleClock -= 1;
+      rippleUniforms.tState.value = field.read.texture;
+      rippleUniforms.uImpulse.value = impulse;
+      renderer.render({ scene: rippleMesh, target: field.write, clear: false });
+      const next = field.read;
+      field.read = field.write;
+      field.write = next;
+      impulse = 0;
+    }
+    pointer.lastX = pointer.x;
+    pointer.lastY = pointer.y;
+  };
+
+  const frame = now => {
+    raf = 0;
+    if (!alive) return;
+    const dt = Math.min(0.05, Math.max(1 / 240, (now - last) / 1000));
+    last = now;
+
+    const moving = !s.paused && !reducedMotion && s.speed !== 0;
+    if (moving) time += dt * s.speed;
+    introClock = s.intro && !reducedMotion ? Math.min(1, introClock + dt / INTRO_SECONDS) : 1;
+    const appear = 1 - Math.pow(1 - clamp(introClock / 0.75, 0, 1), 3);
+    const rise = clamp((introClock - 0.1) / 0.9, 0, 1);
+    const amp = rise * rise * (3 - 2 * rise);
+
+    const rippling = s.interactive && !reducedMotion && !!ripple && s.cursorStrength > 0;
+    if (rippling && pointer.inside && !pointer.placed) {
+      pointer.lastX = pointer.x;
+      pointer.lastY = pointer.y;
+      pointer.placed = true;
+    }
+    if (rippling && (pointer.inside || pointer.burst > 0)) rippleUntil = now + 5000;
+    const rippleActive = rippling && now < rippleUntil;
+    if (rippleActive && ripple) {
+      stepRipple(ripple, dt);
+      rippleLive = true;
+    } else if (rippleLive) {
+      clearRipple();
+      rippleLive = false;
+    }
+
+    const patternIndex = PATTERNS[s.pattern] ?? 0;
+    if (patternIndex === 4) refreshAtlas();
+
+    const canvasW = gl.canvas.width;
+    const canvasH = gl.canvas.height;
+    const dpr = canvasW / width;
+    const pitchY = Math.max(4, Math.round(clamp(s.spacing, 4, 120) * dpr));
+    const pitchX = patternIndex === 3 ? Math.max(2, Math.round(pitchY / 4)) : pitchY;
+    const cols = Math.min(4096, Math.ceil(canvasW / pitchX) + 1);
+    const rows = Math.min(4096, Math.ceil(canvasH / pitchY) + 2);
+    const origin = [Math.floor((canvasW - cols * pitchX) / 2), Math.floor((canvasH - rows * pitchY) / 2)];
+    if (fieldTarget.width !== cols || fieldTarget.height !== rows) {
+      dispose(fieldTarget);
+      fieldTarget = fieldTargetFor(cols, rows);
+      markUniforms.tField.value = fieldTarget.texture;
+    }
+    const heading = (s.direction * Math.PI) / 180;
+    const lightAngle = ((s.direction + 180 + clamp(s.light, -90, 90)) * Math.PI) / 180;
+    const background = s.background;
+    const ink = background[3] > 0.02 ? luminance(s.color) < luminance(background) : luminance(s.color) < 0.5;
+
+    fieldUniforms.uSize.value = [width, height];
+    fieldUniforms.uDpr.value = dpr;
+    fieldUniforms.uOrigin.value = origin;
+    fieldUniforms.uPitch.value = [pitchX, pitchY];
+    fieldUniforms.uWave.value = WAVES[s.wave] ?? 0;
+    fieldUniforms.uTime.value = time;
+    fieldUniforms.uUnit.value = WAVE_UNIT * clamp(s.scale, 0.2, 5);
+    fieldUniforms.uHeading.value = [Math.cos(heading), Math.sin(heading)];
+    fieldUniforms.uAmp.value = amp;
+    fieldUniforms.uDepth.value = clamp(s.depth, 0, 1.5);
+    fieldUniforms.uLight.value = [Math.cos(lightAngle) * 0.78, Math.sin(lightAngle) * 0.78, 0.62];
+    fieldUniforms.uShine.value = clamp(s.shine, 0, 2);
+    fieldUniforms.uContrast.value = clamp(s.contrast, 0.3, 3);
+    fieldUniforms.uInk.value = ink ? 1 : 0;
+    fieldUniforms.uOpacity.value = clamp(s.opacity, 0, 1);
+    fieldUniforms.uFade.value = FADES[s.fade] ?? 0;
+    fieldUniforms.uFadeSize.value = clamp(s.fadeSize, 0.05, 1);
+    fieldUniforms.uAppear.value = appear;
+    fieldUniforms.tRipple.value = ripple && rippleLive ? ripple.read.texture : blank;
+    fieldUniforms.uRipple.value = rippleLive ? 0.32 : 0;
+    renderer.render({ scene: fieldMesh, target: fieldTarget });
+
+    markUniforms.uOrigin.value = origin;
+    markUniforms.uPitch.value = [pitchX, pitchY];
+    markUniforms.uGrid.value = [cols, rows];
+    markUniforms.uPattern.value = patternIndex;
+    markUniforms.uMarkSize.value = clamp(s.markSize, 0.05, 1);
+    markUniforms.uStroke.value = patternIndex === 3 ? 0.9 * dpr : Math.max(1.1 * dpr, pitchY * 0.08);
+    const tint = ink ? 0 : 1;
+    const blend = ink ? 0.35 : 0.55;
+    markUniforms.uColor.value = s.color.slice(0, 3);
+    markUniforms.uAccent.value = s.color.slice(0, 3).map(channel => channel + (tint - channel) * blend);
+    markUniforms.uBackground.value = background;
+    renderer.render({ scene: markMesh });
+    dirty = false;
+
+    if (visible && (moving || introClock < 1 || rippleActive || dirty)) raf = requestAnimationFrame(frame);
+  };
+
+  const start = () => {
+    if (raf || !visible || !alive) return;
+    last = performance.now();
+    raf = requestAnimationFrame(frame);
+  };
+
+  const locate = e => {
+    const rect = container.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    return { x, y, inside: x >= 0 && y >= 0 && x <= rect.width && y <= rect.height };
+  };
+
+  const onPointerMove = e => {
+    const spot = locate(e);
+    pointer.x = spot.x;
+    pointer.y = spot.y;
+    if (spot.inside !== pointer.inside) pointer.placed = false;
+    pointer.inside = spot.inside;
+    if (spot.inside) start();
+  };
+
+  const onPointerDown = e => {
+    const spot = locate(e);
+    if (!spot.inside) return;
+    pointer.x = spot.x;
+    pointer.y = spot.y;
+    if (!pointer.inside) {
+      pointer.lastX = spot.x;
+      pointer.lastY = spot.y;
+    }
+    pointer.burst = 1.2;
+    start();
+  };
+
+  const onPointerLeave = () => {
+    pointer.inside = false;
+    pointer.placed = false;
+    start();
+  };
+
+  const onPointerOut = e => { if (!e.relatedTarget) onPointerLeave(); };
+  const onPointerUp = e => { if (e.pointerType === 'touch') onPointerLeave(); };
+  const onVisibility = () => { if (!document.hidden) start(); };
+
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('pointerdown', onPointerDown, { passive: true });
+  window.addEventListener('pointerout', onPointerOut, { passive: true });
+  window.addEventListener('pointerup', onPointerUp, { passive: true });
+  window.addEventListener('blur', onPointerLeave);
+  document.addEventListener('visibilitychange', onVisibility);
+
+  new ResizeObserver(resize).observe(container);
+  new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting;
+    start();
+  }).observe(container);
+
+  resize();
+}
+
+initPatternWaves(document.getElementById('bg'), SETTINGS);
+</script>
+</body>
+</html>
